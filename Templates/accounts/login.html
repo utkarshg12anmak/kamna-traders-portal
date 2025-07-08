@@ -1,13 +1,29 @@
 <!-- File path: KAMNA-TRADERS-PORTAL/Templates/accounts/login.html -->
 {% load static %}
-  {% include "components.html" %}
+{% include "components.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kamna Traders Portal – Login</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
+
+  <!-- Google font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
 
   <style>
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
-      background-color: var(--primary-color);
+      background: linear-gradient(135deg, #1A2766, #AE1B1E);
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -34,7 +50,7 @@
     }
 
     .login-header {
-      padding: 30px 30px 8px;
+      padding: 20px 20px 8px;
       text-align: center;
       border-bottom: 1px solid #f0f0f0;
     }
@@ -45,7 +61,7 @@
     }
 
     .login-body {
-      padding: 30px;
+      padding: 10px 40px 10px 40px;
     }
     .login-body label {
       display: block;
@@ -89,20 +105,22 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 16px;
-      transition: background-color 0.3s, box-shadow 0.3s ease, transform 0.1s ease;
+      background: linear-gradient(135deg, #1A2766, #AE1B1E);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      transition: opacity 0.3s, transform 0.1s ease;
     }
-    .login-body button.btn-primary:hover {
-      background-color: #002e41;
-      box-shadow: 0 4px 12px rgba(0, 51, 71, 0.3);
+    .login-body button:hover {
+      opacity: 0.9;
     }
-    .login-body button.btn-primary:active {
+    .login-body button:active {
       transform: translateY(1px);
-      box-shadow: 0 2px 6px rgba(0, 51, 71, 0.3);
     }
 
     .login-footer {
       text-align: center;
-      padding: 24px;
+      padding: 12px;
       font-size: 0.85rem;
       color: #a0aec0;
       border-top: 1px solid #f0f0f0;
