@@ -1,18 +1,111 @@
-<!-- Templates/dashboard.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kamna Traders Portal – Dashboard</title>
 
-{% include "components.html" %}
+  <!-- Shared CSS variables & components -->
+  {% include "components.html" %}
 
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'favicon_dark.svg' %}" type="image/png" />
+  <link rel="shortcut icon" href="{% static 'favicon_dark.svg' %}" />
 
-{% block content %}
-  <h1>Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
-  <p>Please choose where you want to go:</p>
-  <ul class="dashboard-options">
-    {% for opt in options %}
-      <li>
-        <a href="{% url opt.url %}" class="dashboard-link">
-          {{ opt.label }}
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
-{% endblock %}
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      color: #333;
+    }
+    .dashboard-container {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 800px;
+      width: 90%;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 32px;
+      justify-items: center;
+      align-items: center;
+    }
+    .dashboard-item {
+      text-decoration: none;
+      color: inherit;
+      text-align: center;
+    }
+    .dashboard-item-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: #f7f7f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .dashboard-item-icon img {
+      width: 40px;
+      height: 40px;
+    }
+    .dashboard-item:hover .dashboard-item-icon {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+    .dashboard-item-label {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-grid">
+      <a href="/warehouses/" class="dashboard-item">
+        <div class="dashboard-item-icon">
+          <img src="{% static 'warehouses.png' %}" alt="Warehouse">
+        </div>
+        <div class="dashboard-item-label">Warehouse</div>
+      </a>
+      <a href="/sales/" class="dashboard-item">
+        <div class="dashboard-item-icon">
+          <img src="{% static 'sales.png' %}" alt="Sales">
+        </div>
+        <div class="dashboard-item-label">Sales</div>
+      </a>
+      <a href="/manufacturing/" class="dashboard-item">
+        <div class="dashboard-item-icon">
+          <img src="{% static 'manufacturing.png' %}" alt="Manufacturing">
+        </div>
+        <div class="dashboard-item-label">Manufacturing</div>
+      </a>
+      <a href="/finance/" class="dashboard-item">
+        <div class="dashboard-item-icon">
+          <img src="{% static 'finance.png' %}" alt="Finance">
+        </div>
+        <div class="dashboard-item-label">Finance</div>
+      </a>
+      <a href="/xyz/" class="dashboard-item">
+        <div class="dashboard-item-icon">
+          <img src="{% static 'xyz.png' %}" alt="XYZ">
+        </div>
+        <div class="dashboard-item-label">XYZ</div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
