@@ -1,0 +1,8 @@
+#requirements.txt
+
+Django>=4.2
+psycopg2-binary
+django-storages[boto3]
+boto3
+gunicorn
+EOF
