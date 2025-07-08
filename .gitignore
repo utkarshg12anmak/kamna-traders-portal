@@ -17,5 +17,17 @@ __pycache__/
 staticfiles/
 media/
 
+# Env files
 .env.dev
+.env.prod
+
+# SQLite (only if you’re still using it locally)
+db.sqlite3
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+
+
+
 

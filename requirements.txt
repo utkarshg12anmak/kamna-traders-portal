@@ -1,10 +1,9 @@
 #requirements.txt
 
 Django>=4.2
+dj-database-url
+python-dotenv
 psycopg2-binary
 django-storages[boto3]
 boto3
 gunicorn
-EOF
-
-python-dotenv
