@@ -17,5 +17,5 @@ __pycache__/
 staticfiles/
 media/
 
-.env
+.env.dev
 
