@@ -8,8 +8,23 @@
   <title>Kamna Traders Portal – Login</title>
 
   <!-- Favicon -->
-  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
-  <link rel="shortcut icon" href="{% static 'favicon.svg' %}" />
+    <link
+    rel="icon"
+    href="{% static 'favicon_dark.svg' %}"
+    type="image/svg+xml"
+    media="(prefers-color-scheme: light)"
+  />
+
+  <!-- Dark-mode favicon (shown in browsers using dark theme) -->
+  <link
+    rel="icon"
+    href="{% static 'favicon_light.svg' %}"
+    type="image/svg+xml"
+    media="(prefers-color-scheme: dark)"
+  />
+
+  <!-- Fallback for older browsers -->
+  <link rel="icon" href="{% static 'favicon_dark.svg' %}" type="image/svg+xml" />
 
   <!-- Google font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
