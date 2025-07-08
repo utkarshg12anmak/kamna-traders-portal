@@ -7,3 +7,4 @@ psycopg2-binary
 django-storages[boto3]
 boto3
 gunicorn
+whitenoise
