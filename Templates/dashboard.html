@@ -1,0 +1,18 @@
+<!-- Templates/dashboard.html -->
+
+{% include "components.html" %}
+
+
+{% block content %}
+  <h1>Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+  <p>Please choose where you want to go:</p>
+  <ul class="dashboard-options">
+    {% for opt in options %}
+      <li>
+        <a href="{% url opt.url %}" class="dashboard-link">
+          {{ opt.label }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
