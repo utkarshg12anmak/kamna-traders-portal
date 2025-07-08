@@ -1,0 +1,174 @@
+<!-- File path: KAMNA-TRADERS-PORTAL/Templates/accounts/login.html -->
+{% load static %}
+  {% include "components.html" %}
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: var(--primary-color);
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      background: transparent;
+    }
+    * { box-sizing: border-box; }
+
+    .login-container {
+      width: 400px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .login-container:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-header {
+      padding: 30px 30px 8px;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .login-logo {
+      display: block;
+      margin: 0 auto 16px;
+      max-width: 240px;
+    }
+
+    .login-body {
+      padding: 30px;
+    }
+    .login-body label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #4a5568;
+      margin-bottom: 8px;
+    }
+    .login-body input[type="text"],
+    .login-body input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      background-color: #edf2f7;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--border-radius);
+      margin-bottom: 12px;
+      transition: border-color 0.2s, box-shadow 0.2s ease;
+    }
+    .login-body input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 51, 71, 0.16);
+    }
+    .login-body .toggle-password-label {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #4a5568;
+      margin-bottom: 24px;
+    }
+    .login-body .toggle-password-label input {
+      margin-right: 8px;
+      transform: scale(1.1);
+    }
+
+    .login-body button {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background-color 0.3s, box-shadow 0.3s ease, transform 0.1s ease;
+    }
+    .login-body button.btn-primary:hover {
+      background-color: #002e41;
+      box-shadow: 0 4px 12px rgba(0, 51, 71, 0.3);
+    }
+    .login-body button.btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(0, 51, 71, 0.3);
+    }
+
+    .login-footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.85rem;
+      color: #a0aec0;
+      border-top: 1px solid #f0f0f0;
+    }
+    .login-footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      margin: 0 12px;
+      font-weight: 500;
+      transition: color 0.2s, opacity 0.2s ease;
+    }
+    .login-footer a:hover {
+      color: #002431;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <img src="{% static 'logo_dark.svg' %}" alt="Kamna Traders Logo" class="login-logo" />
+    </div>
+
+    <div class="login-body">
+      <p>Log in to your account to continue!</p>
+      <form method="post" action="{% url 'login' %}" novalidate>
+        {% csrf_token %}
+
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+
+        <label class="toggle-password-label" for="togglePassword">
+          <input type="checkbox" id="togglePassword" />
+          Show Password
+        </label>
+
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+    </div>
+
+    <div class="login-footer">
+      <a href="{% url 'admin:index' %}" target="_blank" rel="noopener">Are you an admin?</a>
+    </div>
+  </div>
+
+  {% if form.non_field_errors %}
+    {{ form.non_field_errors.0|json_script:"errorMsg" }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var msgEl = document.getElementById('errorMsg');
+        if (msgEl) {
+          var msg = JSON.parse(msgEl.textContent);
+          showToast(msg);
+        }
+      });
+    </script>
+  {% endif %}
+
+  <script>
+    document.getElementById('togglePassword').addEventListener('change', function() {
+      const pwdInput = document.getElementById("id_password");
+      pwdInput.type = this.checked ? "text" : "password";
+    });
+  </script>
+</body>
+</html>
