@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 from pathlib import Path
 
@@ -19,7 +20,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load .env file
-load_dotenv(dotenv_path=BASE_DIR / ".env")
+load_dotenv(dotenv_path=BASE_DIR / ".env.prod")
 
 
 # Quick-start development settings - unsuitable for production
@@ -57,8 +58,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",    
 ]
 
 ROOT_URLCONF = "kamna_traders.urls"
@@ -84,12 +84,22 @@ WSGI_APPLICATION = "kamna_traders.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# 1) Local default: SQLite for development
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# 2) Heroku override: use DATABASE_URL if present
+DATABASE_URL = os.environ.get("DATABASE_URL")
+db_from_env = dj_database_url.config(
+    default=DATABASE_URL,
+    conn_max_age=600,      # keep DB connections persistent
+    ssl_require=True       # ensure SSL on Postgres
+)
+DATABASES["default"].update(db_from_env)
 
 
 # Password validation
@@ -139,3 +149,10 @@ LOGIN_REDIRECT_URL = '/'   # or wherever you want to land post-login
 STATICFILES_DIRS = [ BASE_DIR / 'static' ] 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'   
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
+
