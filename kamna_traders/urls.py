@@ -6,15 +6,23 @@ from django.http import HttpResponse
 from django.views.generic import RedirectView
 from accounts.views import dashboard
 from django.conf import settings
+from django.contrib.auth.views import LogoutView
 
 def home(request):
     return HttpResponse("Kamna Traders Portal is up and running!")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('accounts.urls')),
     path('', dashboard, name='dashboard'),
     path('', RedirectView.as_view(url='login/', permanent=False)),
-    path('', include('accounts.urls')),
+    
+    path(
+        "logout/",
+        LogoutView.as_view(next_page="login"),
+        name="logout",
+    ),
+
     
 ]
 
