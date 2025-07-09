@@ -3,9 +3,14 @@ from django.shortcuts import render, get_object_or_404
 from .models import PageItem
 
 def dashboard(request):
-    # Level-1 items are those without a parent
+    # 1) All level-1 items:
     items = PageItem.objects.filter(parent__isnull=True).order_by("name")
-    return render(request, "dashboard.html", {"dashboard_items": items})
+    # 2) Allowed IDs from session (might be missing or empty)
+    allowed = set(request.session.get("page_items", []))
+    return render(request, "dashboard.html", {
+        "dashboard_items": items,
+        "allowed_page_ids": allowed,
+    })
 
 def page_item(request, slug):
     # Find the item by slugified name

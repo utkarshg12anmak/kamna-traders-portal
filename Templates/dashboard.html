@@ -148,6 +148,16 @@
       align-items: center;       /* center horizontally */
       justify-content: flex-start; /* start from top */            
     }
+
+    .dashboard-item.disabled {
+        opacity: 0.4;           /* greyed-out look */
+        pointer-events: none;   /* disable all hover/click */
+      }
+
+      .dashboard-item.disabled .dashboard-item-icon {
+        filter: grayscale(80%); /* optional: also desaturate the icon */
+      }
+
     
       
     .greeting {
@@ -190,19 +200,28 @@
   
   <div class="dashboard-wrapper">
     <div class="greeting" id="greeting"> Hi, {{request.session.first_name}} {{request.session.last_name}} ! </div>
-    
-      <div class="dashboard-container">
-        <div class="dashboard-grid">
-          {% for item in dashboard_items %}
-            <a href="{{ item.get_absolute_url }}" class="dashboard-item{% if item.disabled %} disabled{% endif %}">
-              <div class="dashboard-item-icon">
-                <img src="{% static item.icon_name %}" alt="{{ item.name }}">
-              </div>
-              <div class="dashboard-item-label">{{ item.name }}</div>
-            </a>
-          {% endfor %}
+        
+ <div class="dashboard-container">
+  <div class="dashboard-grid">
+    {% for item in dashboard_items %}
+      <a
+        href="{{ item.get_absolute_url }}"
+        class="dashboard-item{% if item.id not in allowed_page_ids %} disabled{% endif %}"
+        {% if item.id not in allowed_page_ids %}aria-disabled="true"{% endif %}
+      >
+        <div class="dashboard-item-icon">
+          <img src="{% static item.icon_name %}" alt="{{ item.name }}">
         </div>
-      </div>
+        <div class="dashboard-item-label">{{ item.name }}</div>
+      </a>
+    {% empty %}
+      <p>No pages configured.</p>
+    {% endfor %}
+  </div>
+</div>
+
+
+
 
   </div>
 
