@@ -1,22 +1,13 @@
-#department/models.py
-
+# department/models.py
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
-
 def validate_file_size(value):
     limit = 100 * 1024 * 1024  # 100 MB
     if value.size > limit:
         raise ValidationError('File too large. Size must be ≤ 100 MB.')
-
-
-class DepartmentCategory(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
 
 
 class UserProfile(models.Model):
@@ -44,6 +35,26 @@ class DepartmentType(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class DepartmentSubtype(models.Model):
+    """
+    A subtype belonging to exactly one DepartmentType.
+    """
+    type = models.ForeignKey(
+        DepartmentType,
+        on_delete=models.CASCADE,
+        related_name="subtypes"
+    )
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        unique_together = ("type", "name")
+        ordering = ["type__name", "name"]
+        verbose_name = "Department Subtype"
+
+    def __str__(self):
+        return f"{self.type.name} → {self.name}"
 
 
 class DepartmentRegion(models.Model):
@@ -83,28 +94,35 @@ class Department(models.Model):
         on_delete=models.PROTECT,
         help_text="Leave blank for a top-level department"
     )
-    dept_type = models.ForeignKey(DepartmentType, on_delete=models.PROTECT)
-    region = models.ForeignKey(DepartmentRegion, on_delete=models.PROTECT)
-    category = models.ForeignKey(
-        DepartmentCategory,
+    dept_type = models.ForeignKey(
+        DepartmentType,
+        on_delete=models.PROTECT,
+        related_name="departments"
+    )
+    subtype = models.ForeignKey(
+        DepartmentSubtype,
         on_delete=models.PROTECT,
         null=True, blank=True,
-        help_text="Optional category"
+        related_name="departments",
+        help_text="Optional subtype (must belong to selected Type)"
     )
-    draft_quotation = models.FileField(
-        upload_to='departments/draft_quotations/',
-        validators=[
-            FileExtensionValidator(allowed_extensions=['docx']),
-            validate_file_size
-        ],
-        blank=True, null=True,
-        help_text='Upload a DOCX up to 100 MB.'
+    region = models.ForeignKey(DepartmentRegion, on_delete=models.PROTECT)
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through="DepartmentMembership",
+        related_name="departments"
     )
 
     class Meta:
         unique_together = ('parent', 'name')
 
     def clean(self):
+        # 1) Enforce subtype → type consistency
+        if self.subtype and self.subtype.type_id != self.dept_type_id:
+            raise ValidationError({
+                "subtype": "Subtype must belong to the selected Department Type."
+            })
+        # 2) Enforce max nesting of 3
         depth = 1
         p = self.parent
         while p:
@@ -127,17 +145,37 @@ class Department(models.Model):
 
 
 class DepartmentMembership(models.Model):
-    LEVEL_CHOICES = [(1, "Level 1"), (2, "Level 2"), (3, "Level 3")]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    level = models.PositiveSmallIntegerField(choices=LEVEL_CHOICES)
+    L1 = 1
+    L2 = 2
+    L3 = 3
+    LEVEL_CHOICES = [
+        (L1, "L1 (Top)"),
+        (L2, "L2 (Mid)"),
+        (L3, "L3 (Base)"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="department_memberships"
+    )
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        related_name="department_memberships"
+    )
+    level = models.PositiveSmallIntegerField(
+        choices=LEVEL_CHOICES,
+        default=L3,
+        help_text="1=Top, 2=Mid, 3=Base"
+    )
 
     class Meta:
-        unique_together = ('user', 'department', 'level')
+        unique_together = ("user", "department")
+        ordering = ["department__name", "level"]
 
     def __str__(self):
-        name = self.user.get_full_name() or self.user.username
-        return f"{name} → {self.department.name} (Level {self.level})"
+        return f"{self.user.username} in {self.department.name} at L{self.level}"
 
 
 class ApprovalLimit(models.Model):
@@ -148,7 +186,7 @@ class ApprovalLimit(models.Model):
         related_name="approval_limits",
         help_text="Department this limit applies to"
     )
-    level = models.PositiveSmallIntegerField(choices=LEVEL_CHOICES)
+    level = models.PositiveIntegerField(choices=LEVEL_CHOICES)
     max_amount = models.PositiveIntegerField(help_text="Max quote total auto-approved")
 
     class Meta:
