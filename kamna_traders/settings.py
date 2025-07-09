@@ -31,6 +31,8 @@ DEBUG = os.getenv("DJANGO_DEBUG") == "True"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,6 +51,7 @@ AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # ← directly after SecurityMiddleware
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -132,7 +135,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'   # or wherever you want to land post-login
 
+# Use WhiteNoise’s compressed manifest storage (optional but recommended)
 STATICFILES_DIRS = [ BASE_DIR / 'static' ] 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'   
-
