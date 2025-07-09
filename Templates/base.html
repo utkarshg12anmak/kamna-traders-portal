@@ -61,7 +61,7 @@
     .info .name { font-weight:600; }
     .info .designation { font-size:0.8rem;color:rgba(255,255,255,0.75); }
     .logout button {
-      width:100%;padding:10px;background:#e53e3e;color:#fff;
+      width:100%;padding:10px;background:var(--primary-color);color:#fff;
       border:none;border-radius:6px;font-weight:500;cursor:pointer;
       transition:background 0.2s;
     }
@@ -129,7 +129,13 @@
       <div class="logout">
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
-          <button type="submit">Log Out</button>
+          <div class="logout">
+            <form action="{% url 'dashboard' %}" method="get" style="display:inline;">
+            <button type="submit" class="logout-btn">
+                ← Back to Dashboard
+            </button>
+            </form>
+            </div>
         </form>
       </div>
     </div>
