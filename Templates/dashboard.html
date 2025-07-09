@@ -149,28 +149,28 @@
       justify-content: flex-start; /* start from top */            
     }
     
-    
-  .greeting {
-    display: inline-block;
-    font-family: 'Inter', sans-serif;
-    font-size: 3.5rem;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 60px;
+      
+    .greeting {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 100px;
 
-    /* hide overflow so we can reveal one letter at a time */
-    overflow: hidden;
-    white-space: pre;               /* preserve spaces */
-    border-right: 2px solid currentColor;
-  }
+      /* hide overflow so we can reveal one letter at a time */
+      overflow: hidden;
+      white-space: pre;               /* preserve spaces */
+      border-right: 2px solid currentColor;
+    }
 
-  /* blinking cursor */
-  @keyframes blink {
-    50% { border-color: transparent; }
-  }
-  .greeting.blink {
-    animation: blink 1s step-end infinite;
-  }
+    /* blinking cursor */
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+    .greeting.blink {
+      animation: blink 1s step-end infinite;
+    }
     
   </style>
 </head>
