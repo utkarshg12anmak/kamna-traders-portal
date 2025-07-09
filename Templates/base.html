@@ -22,7 +22,13 @@
     /* ==== SIDEBAR ==== */
     body { margin:0; display:flex; height:100vh; overflow:hidden; font-family:'Inter',sans-serif; }
     .sidebar {
-      width:260px; background:#003347; color:#fff;
+      width:260px;
+        background: linear-gradient(
+            135deg,
+            var(--primary-color) 45%,
+            var(--secondary-color) 100%
+        );
+      color:#fff;
       display:flex; flex-direction:column; padding:24px 16px;
     }
     .logo img { width:180px; display:block; margin:0 auto 24px; }
