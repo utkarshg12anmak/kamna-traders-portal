@@ -6,17 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kamna Traders Portal – Dashboard</title>
   
+  <!-- ICO fallback for older browsers -->
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+  <!-- SVG fallback -->
+  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+
+  <!-- Light-mode SVG -->
+  <link
+    rel="icon"
+    href="{% static 'favicon_light.svg' %}"
+    type="image/svg+xml"
+    media="(prefers-color-scheme: light)"
+  />
+
+  <!-- Dark-mode SVG -->
+  <link
+    rel="icon"
+    href="{% static 'favicon_dark.svg' %}"
+    type="image/svg+xml"
+    media="(prefers-color-scheme: dark)"
+  />
+
   <!-- Shared CSS variables & components -->
   {% include "components.html" %}
-  
-  <!-- Favicon -->
-  <link
-  rel="icon"
-  href="{% static 'favicon_dark.svg' %}"
-  type="image/svg+xml"
-  media="(prefers-color-scheme: light)"
-  />
-  
+
   <style>
     html, body {
       height: 100%;
@@ -186,7 +200,7 @@
 </head>
 <body>
   <div class="dashboard-header">
-    <img src="{% static 'logo_light.svg' %}" alt="Kamna Traders Logo" class="dashboard-logo">
+
    <!-- <a href="{% url 'logout' %}" class="logout-btn">Log Out</a> -->
 
     <form method="post" action="{% url 'logout' %}" style="display:inline;">
