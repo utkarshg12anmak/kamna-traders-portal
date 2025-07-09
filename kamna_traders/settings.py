@@ -150,9 +150,20 @@ STATICFILES_DIRS = [ BASE_DIR / 'static' ]
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'   
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+
+# Only enforce HTTPS in prod
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600
+    # …and any other prod‐only security settings
+else:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
 
 
