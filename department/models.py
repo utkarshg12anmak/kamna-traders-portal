@@ -3,6 +3,8 @@ from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
+from web_pages.models import PageItem
+
 
 def validate_file_size(value):
     limit = 100 * 1024 * 1024  # 100 MB
@@ -47,6 +49,12 @@ class DepartmentSubtype(models.Model):
         related_name="subtypes"
     )
     name = models.CharField(max_length=100)
+    page_items = models.ManyToManyField(
+        PageItem,
+        blank=True,
+        related_name="subtypes",
+        help_text="Which top-level web pages map here?"
+    )
 
     class Meta:
         unique_together = ("type", "name")
