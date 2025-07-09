@@ -15,15 +15,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
     path('', dashboard, name='dashboard'),
-    path('', RedirectView.as_view(url='login/', permanent=False)),
-    
+    path('', RedirectView.as_view(url='login/', permanent=False)),    
     path(
         "logout/",
         LogoutView.as_view(next_page="login"),
         name="logout",
     ),
-
-    
 ]
 
 if settings.DEBUG:
