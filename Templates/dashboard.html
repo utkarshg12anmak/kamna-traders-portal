@@ -58,7 +58,10 @@
     }
 
     .dashboard-container {
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.25);      /* translucent white */
+      backdrop-filter: blur(10px);                /* frosted blur behind */
+      -webkit-backdrop-filter: blur(10px);        /* Safari support */
+      border: 1px solid rgba(255, 255, 255, 0.4); /* light glass edge */
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       padding: 80px 40px 40px;
@@ -66,6 +69,8 @@
       width: 90%;
       text-align: center;
     }
+
+
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -99,6 +104,7 @@
     .dashboard-item-label {
       font-size: 1.1rem;
       font-weight: 500;
+      color: #FFFFFF;
     }
   </style>
 </head>
