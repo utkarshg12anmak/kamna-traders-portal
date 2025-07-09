@@ -14,4 +14,5 @@ urlpatterns = [
     path('', dashboard, name='dashboard'),
     path('', RedirectView.as_view(url='login/', permanent=False)),
     path('', include('accounts.urls')),
+    
 ]
