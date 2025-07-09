@@ -23,7 +23,8 @@ urlpatterns = [
 
     # Dashboard home
     path("", wp_views.dashboard, name="dashboard"),
-    # Per-item pages
+
+    # Page‐item pages (e.g. /catalog/, /sales/, etc.)
     path("<slug:slug>/", wp_views.page_item, name="page-item"),
 ]
 

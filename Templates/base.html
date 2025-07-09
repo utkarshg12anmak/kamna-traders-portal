@@ -1,0 +1,152 @@
+<!--Templates/base.html-->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <title>{% block title %}{{ current_item.name }} – Kamna Traders{% endblock %}</title>
+
+  <link rel="icon" href="{% static 'favicon_light.svg' %}" type="image/svg+xml">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"/>
+
+  <!-- shared variables & components -->
+  {% include "components.html" %}
+
+  <style>
+    /* ==== SIDEBAR ==== */
+    body { margin:0; display:flex; height:100vh; overflow:hidden; font-family:'Inter',sans-serif; }
+    .sidebar {
+      width:260px; background:#003347; color:#fff;
+      display:flex; flex-direction:column; padding:24px 16px;
+    }
+    .logo img { width:180px; display:block; margin:0 auto 24px; }
+    nav ul { list-style:none; padding:0; }
+    nav li { position:relative; margin:8px 0; }
+    nav a.nav-link {
+      display:flex; align-items:center; gap:0.75rem;
+      color:#fff; text-decoration:none;
+      padding:10px 14px; border-radius:6px;
+      transition:background 0.2s;
+    }
+    nav a.nav-link.active,
+    nav a.nav-link:hover { background:rgba(255,255,255,0.2); }
+
+    .submenu {
+      display:none; list-style:none; margin:4px 0 4px 8px; padding:0;
+    }
+    .has-submenu.open > .submenu,
+    .has-submenu:hover  > .submenu { display:block; }
+    .submenu li a {
+      display:block; padding:8px 14px; font-size:0.95rem;
+      border-radius:4px; background:rgba(255,255,255,0.04);
+    }
+    .submenu li a.active,
+    .submenu li a:hover { background:rgba(255,255,255,0.1); }
+
+    .bottom-group { margin-top:auto; }
+    .profile { display:flex; align-items:center; gap:12px; }
+    .avatar { width:40px;height:40px;border-radius:50%;border:2px solid #fff; }
+    .info .name { font-weight:600; }
+    .info .designation { font-size:0.8rem;color:rgba(255,255,255,0.75); }
+    .logout button {
+      width:100%;padding:10px;background:#e53e3e;color:#fff;
+      border:none;border-radius:6px;font-weight:500;cursor:pointer;
+      transition:background 0.2s;
+    }
+    .logout button:hover { background:#c53030; }
+
+    /* ==== MAIN AREA ==== */
+    .main {
+      flex:1; background:#f7f9fc; padding:32px; overflow-y:auto;
+    }
+    .main h1 { font-size:2rem;color:#1a202c;margin-bottom:8px; }
+    .main p { font-size:1rem;color:#4a5568;margin-bottom:24px; }
+
+    /* nav-icon style */
+    .nav-icon img {
+      width:1.25rem; height:1.25rem;
+      filter:brightness(0) invert(1);
+      display:block;
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="{% static 'logo_light.svg' %}" alt="Logo"/>
+    </div>
+    <nav>
+      <ul>
+        {% for child in nav_items %}
+          <li class="has-submenu {% if child == current_item %}open{% endif %}">
+            <a href="{{ child.get_absolute_url }}"
+               class="nav-link {% if child == current_item %}active{% endif %}">
+              <span class="nav-icon">
+                <img src="{% static child.icon_name %}"
+                     alt="{{ child.name }}" aria-hidden="true">
+              </span>
+              <span class="nav-label">{{ child.name }}</span>
+            </a>
+            {% if child.children.all %}
+              <ul class="submenu">
+                {% for sub in child.children.all %}
+                  <li>
+                    <a href="{{ sub.get_absolute_url }}"
+                       class="{% if request.path == sub.get_absolute_url %}active{% endif %}">
+                      {{ sub.name }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <div class="bottom-group">
+      <div class="profile">
+        <img src="{% static 'profile-user.png' %}" alt="Avatar" class="avatar"/>
+        <div class="info">
+          <span class="name">{{ request.session.first_name }} {{ request.session.last_name }}</span></br>
+          <span class="designation">{{ request.session.job_title }}</span>
+        </div>
+      </div>
+      <hr/>
+      <div class="logout">
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">Log Out</button>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    {% block content %}{% endblock %}
+    {% if messages %}
+      <div id="toast-container">
+        {% for msg in messages %}
+          <div class="toast toast-{{ msg.tags }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </main>
+
+  <script>
+    document.querySelectorAll('.has-submenu > a').forEach(anchor => {
+      anchor.addEventListener('click', e => {
+        e.preventDefault();
+        anchor.parentElement.classList.toggle('open');
+      });
+    });
+  </script>
+</body>
+</html>

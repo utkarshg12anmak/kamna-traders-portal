@@ -1,0 +1,48 @@
+{# loader.html –– a single, self-contained loader + reveal script #}
+
+<style>
+  #page-loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .roller-spinner {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #003347;
+    animation: rollerSpin 1s cubic-bezier(0.68, -0.6, 0.32, 1.6) infinite;
+  }
+
+  @keyframes rollerSpin {
+    0%   { transform: rotate(0deg); }
+    60%  { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  #page-content {
+    visibility: hidden;
+  }
+</style>
+
+<div id="page-loader">
+  <div class="roller-spinner"></div>
+</div>
+
+<script>
+  window.addEventListener('load', function () {
+    const loader = document.getElementById('page-loader');
+    const content = document.getElementById('page-content');
+    setTimeout(() => {
+      if (loader) loader.style.opacity = '0';
+      setTimeout(() => loader?.remove(), 300);
+      if (content) content.style.visibility = 'visible';
+    }, 100);
+  });
+</script>
