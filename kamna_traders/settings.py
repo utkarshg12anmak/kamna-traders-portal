@@ -171,3 +171,4 @@ if DEBUG:
         "SHOW_TOOLBAR_CALLBACK": lambda request: True,
     }
 
+LOGOUT_REDIRECT_URL = "login"
