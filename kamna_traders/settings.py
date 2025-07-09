@@ -159,11 +159,43 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 3600
-    # …and any other prod‐only security settings
 else:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 
+# Only enable the Debug Toolbar in development
+if DEBUG:
+    # 1) Add to INSTALLED_APPS
+    INSTALLED_APPS += [
+        "debug_toolbar",
+    ]
+
+    # 2) Insert its middleware as early as possible
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    )
+
+    # 3) Configure which IPs can see the toolbar
+    INTERNAL_IPS = [
+        "127.0.0.1",
+        # if you’re testing in Docker or on another host, add those IPs here
+    ]
+
+    # 4) Optional: narrow which panels to load (default is all)
+    DEBUG_TOOLBAR_PANELS = [
+        "debug_toolbar.panels.timer.TimerPanel",
+        "debug_toolbar.panels.sql.SQLPanel",
+        "debug_toolbar.panels.headers.HeadersPanel",
+        "debug_toolbar.panels.request.RequestPanel",
+        "debug_toolbar.panels.templates.TemplatesPanel",
+        # …you can tune this list
+    ]
+
+    # 5) Optional: show toolbar even if you’re not in DEBUG for a specific user
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+    }
 
 
