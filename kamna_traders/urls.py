@@ -7,6 +7,7 @@ from django.views.generic import RedirectView
 from accounts.views import dashboard
 from django.conf import settings
 from django.contrib.auth.views import LogoutView
+from web_pages import views as wp_views
 
 def home(request):
     return HttpResponse("Kamna Traders Portal is up and running!")
@@ -19,7 +20,11 @@ urlpatterns = [
         name='logout'
     ),
     path('', include('accounts.urls')),
-    path('', dashboard, name='dashboard'),
+
+    # Dashboard home
+    path("", wp_views.dashboard, name="dashboard"),
+    # Per-item pages
+    path("<slug:slug>/", wp_views.page_item, name="page-item"),
 ]
 
 if settings.DEBUG:

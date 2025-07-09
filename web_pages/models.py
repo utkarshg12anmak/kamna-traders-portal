@@ -1,6 +1,8 @@
 # webpages/models.py
 
 from django.db import models
+from django.urls import reverse
+from django.utils.text import slugify
 
 class PageItem(models.Model):
     """
@@ -35,3 +37,9 @@ class PageItem(models.Model):
             level += 1
             p = p.parent
         return level
+    def get_absolute_url(self):
+        """
+        Return a URL for this page item. Adjust the name or pattern to match your URLconf.
+        Here we’ll slugify the name and assume a view at path('<slug>/', ...).
+        """
+        return reverse("page-item", args=[slugify(self.name)])

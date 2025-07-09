@@ -191,34 +191,19 @@
   <div class="dashboard-wrapper">
     <div class="greeting" id="greeting"> Hi, {{request.session.first_name}} {{request.session.last_name}} ! </div>
     
-    <div class="dashboard-container">
-      <div class="dashboard-grid">
-        <a href="/warehouses/" class="dashboard-item">
-          <div class="dashboard-item-icon">
-            <img src="{% static 'warehouse.png' %}" alt="Warehouse">
-          </div>
-          <div class="dashboard-item-label">Warehouse</div>
-        </a>
-        <a href="/sales/" class="dashboard-item">
-          <div class="dashboard-item-icon">
-            <img src="{% static 'sales.png' %}" alt="Sales">
-          </div>
-          <div class="dashboard-item-label">Sales</div>
-        </a>
-        <a href="/manufacturing/" class="dashboard-item">
-          <div class="dashboard-item-icon">
-            <img src="{% static 'manufacturing.png' %}" alt="Manufacturing">
-          </div>
-          <div class="dashboard-item-label">Manufacturing</div>
-        </a>
-        <a href="/finance/" class="dashboard-item">
-          <div class="dashboard-item-icon">
-            <img src="{% static 'finance.png' %}" alt="Finance">
-          </div>
-          <div class="dashboard-item-label">Finance</div>
-        </a>
+      <div class="dashboard-container">
+        <div class="dashboard-grid">
+          {% for item in dashboard_items %}
+            <a href="{{ item.get_absolute_url }}" class="dashboard-item{% if item.disabled %} disabled{% endif %}">
+              <div class="dashboard-item-icon">
+                <img src="{% static item.icon_name %}" alt="{{ item.name }}">
+              </div>
+              <div class="dashboard-item-label">{{ item.name }}</div>
+            </a>
+          {% endfor %}
+        </div>
       </div>
-    </div>
+
   </div>
 
 <script>
