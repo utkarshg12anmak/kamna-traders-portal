@@ -131,9 +131,14 @@
           {% csrf_token %}
           <div class="logout">
             <form action="{% url 'dashboard' %}" method="get" style="display:inline;">
-            <button type="submit" class="logout-btn">
+                <button
+                type="button"
+                class="logout-btn"
+                onclick="window.location.href='{% url 'dashboard' %}'"
+                >
                 ← Back to Dashboard
-            </button>
+                </button>
+
             </form>
             </div>
         </form>
