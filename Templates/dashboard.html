@@ -118,51 +118,29 @@
       height: 100vh;             /* fill the full viewport height */
       padding-top: 500px;         /* optional top gutter */
     }
+    
+    
+  .greeting {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 60px;
 
+    /* hide overflow so we can reveal one letter at a time */
+    overflow: hidden;
+    white-space: pre;               /* preserve spaces */
+    border-right: 2px solid currentColor;
+  }
 
-    .greeting {
-      /* shrink-wrap to its text, so it can be centered */
-      display: inline-block;
-      margin: 0 auto 24px;
-      font-size: 2.5rem;
-      font-weight: 600;
-      margin-bottom: 50px;
-      color: #fff;
-      overflow: hidden;
-      white-space: nowrap;
-      border-right: 2px solid currentColor;
-      animation:
-      blink-cursor 0.7s steps(2) infinite,
-      typing      2s steps(17)     1 forwards 0.5s;
-    }
-    
-    /* tiny tweak: no more move-left animation */
-    @keyframes move-left { /* you can drop this altogether */ }
-    
-    
-    /* 1) cursor blink */
-    @keyframes blink-cursor {
-      50% { border-color: transparent; }
-    }
-    
-    /* 2) slide from center to 10% from left */
-    @keyframes move-left {
-      from {
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      to {
-        left: 10%;
-        transform: translate(0, -50%);
-      }
-    }
-    
-    /* 3) type out the text */
-    @keyframes typing {
-      from { width: 0ch; }
-      to   { width: 10ch; } /* length of “Hi, John Doe!” */
-    }
-    
+  /* blinking cursor */
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+  .greeting.blink {
+    animation: blink 1s step-end infinite;
+  }
     
   </style>
 </head>
@@ -175,7 +153,7 @@
   <!-- put this somewhere after your body opens -->
   
   <div class="dashboard-wrapper">
-    <div class="greeting"> Hi, John Doe! </div>
+    <div class="greeting" id="greeting"> Hi, {{request.session.first_name}} {{request.session.last_name}} ! </div>
     
     <div class="dashboard-container">
       <div class="dashboard-grid">
@@ -206,5 +184,32 @@
       </div>
     </div>
   </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const el = document.getElementById("greeting");
+  const text = el.textContent;     // e.g. "Hi, Utkarsh Gupta !"
+  el.textContent = "";             // clear it out
+  el.classList.add("blink");       // start blinking
+
+  // Total duration you want (in ms)
+  const totalDuration = 2000;
+  // Calculate delay per character
+  const delay = totalDuration / text.length;
+
+  let idx = 0;
+  const ticker = setInterval(() => {
+    el.textContent += text[idx++];
+    if (idx >= text.length) {
+      clearInterval(ticker);
+      // stop cursor blink if you like:
+      // el.classList.remove("blink");
+    }
+  }, delay);
+});
+</script>
+
+  
+  
 </body>
 </html>
