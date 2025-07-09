@@ -12,15 +12,14 @@ def home(request):
     return HttpResponse("Kamna Traders Portal is up and running!")
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), 
+    path(
+        'logout/',
+        LogoutView.as_view(next_page='login'),
+        name='logout'
+    ),
     path('', include('accounts.urls')),
     path('', dashboard, name='dashboard'),
-    path('', RedirectView.as_view(url='login/', permanent=False)),    
-    path(
-        "logout/",
-        LogoutView.as_view(next_page="login"),
-        name="logout",
-    ),
 ]
 
 if settings.DEBUG:

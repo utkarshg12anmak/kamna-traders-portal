@@ -8,10 +8,5 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(
         template_name='accounts/login.html'  # our new template
     ), name='login'),
-    path(
-        "logout/",
-        LogoutView.as_view(next_page="login"),
-        name="logout",
-    ),
 ]
 
