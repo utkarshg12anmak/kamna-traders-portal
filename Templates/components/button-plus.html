@@ -1,15 +1,17 @@
 {# templates/components/button.html #}
 
 <style>
+/* button-plus component */
 .button-plus {
   position: relative;
   width: 150px;
-  height: 35px;
+  height: 40px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  border: 1px solid #34974d;
-  background-color: #3aa856;
+  /* border and background from variables */
+  border: 1px solid {{ dark_color|default:'#34974d' }};
+  background-color: {{ color|default:'#3aa856' }};
   transition: all 0.3s;
 }
 .button-plus__text {
@@ -23,7 +25,8 @@
   transform: translateX(109px);
   height: 100%;
   width: 39px;
-  background-color: #34974d;
+  /* icon background uses darker variant */
+  background-color: {{ dark_color|default:'#34974d' }};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,8 +36,9 @@
   width: 30px;
   stroke: #fff;
 }
+/* hover state uses dark_color */
 .button-plus:hover {
-  background: #34974d;
+  background-color: {{ dark_color|default:'#34974d' }};
 }
 .button-plus:hover .button-plus__text {
   color: transparent;
@@ -43,17 +47,24 @@
   width: 148px;
   transform: translateX(0);
 }
+/* active state keeps dark_color */
 .button-plus:active .button-plus__icon {
-  background-color: #2e8644;
+  background-color: {{ dark_color|default:'#34974d' }};
 }
 .button-plus:active {
-  border: 1px solid #2e8644;
+  border: 1px solid {{ dark_color|default:'#34974d' }};
 }
 </style>
 
-<button type="{{ type|default:'button' }}" class="button-plus {{ class|default:'' }}">
+<button
+  type="{{ type|default:'button' }}"
+  class="button-plus {{ class|default:'' }}"
+>
   <span class="button-plus__text">{{ text }}</span>
   <span class="button-plus__icon">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none" class="svg"><line y2="19" y1="5" x2="12" x1="12"></line><line y2="12" y1="12" x2="19" x1="5"></line></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="none" class="svg">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
   </span>
 </button>
