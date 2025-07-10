@@ -22,6 +22,7 @@ media="(prefers-color-scheme: dark)"
 
 {% block content %}
 
+
 <section class="main-content">
     
     <!-- 2a) PAGE HEADER: Title + Record count + Buttons -->
@@ -30,22 +31,24 @@ media="(prefers-color-scheme: dark)"
             Manage Items
             <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
         </h1>
-        <div class="action-buttons">
+        <div class="action-buttons">            
 
-        {% include "components/button.html" with text='Save Changes' type='submit' variant='primary' class='ml-4' %}                
+        {% include "components/button.html" with text='Explore' type='submit' style='explore' %}
 
-        </div>
-    </div>
+            
     
-    <!-- 2b) FILTERS -->
-    <div class="filters">
-        <a href="" class="btn btn-primary">Filters</a>
-    </div>
-    
-    <!-- 2c) TABLES -->
-    <div class="tables">
-        <a href="" class="btn btn-primary">Tables</a>
-    </div>
-    
+</div>
+</div>
+
+<!-- 2b) FILTERS -->
+<div class="filters">
+    <a href="" class="btn btn-primary">Filters</a>
+</div>
+
+<!-- 2c) TABLES -->
+<div class="tables">
+    <a href="" class="btn btn-primary">Tables</a>
+</div>
+
 </section>
 {% endblock %}

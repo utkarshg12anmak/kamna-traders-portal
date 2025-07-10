@@ -1033,6 +1033,76 @@
   cursor: not-allowed;
 }
 
+</style>
+
+<style>
+    
+/* components.html (inside your <style> block) */
+
+.btn-explore {
+  --clr: var(--primary-color);  /* or override via inline style or extra class */
+  line-height: 1;
+  text-decoration: none;
+  display: inline-flex;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--clr);
+  color: #fff;
+  border-radius: 10rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  padding-left: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.3s;
+}
+
+.btn-explore__icon-wrapper {
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  position: relative;
+  color: var(--clr);
+  background-color: #fff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.btn-explore:hover {
+  background-color: #000;
+}
+
+.btn-explore:hover .btn-explore__icon-wrapper {
+  color: #000;
+}
+
+/* first icon in the wrapper */
+.btn-explore__icon-svg:first-child {
+  position: absolute;
+  transform: translate(-150%, 150%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.btn-explore:hover .btn-explore__icon-svg:first-child {
+  transform: translate(150%, -150%);
+}
+
+/* the “copy” icon */
+.btn-explore__icon-svg--copy {
+  position: absolute;
+  transform: translate(-150%, 150%);
+  transition: transform 0.3s ease-in-out 0.1s;
+}
+
+.btn-explore:hover .btn-explore__icon-svg--copy {
+  transform: translate(0);
+}
+
 
 
 </style>
