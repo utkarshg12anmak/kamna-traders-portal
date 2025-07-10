@@ -26,6 +26,7 @@ urlpatterns = [
 
     # Page‐item pages (e.g. /catalog/, /sales/, etc.)
     path("<slug:slug>/", wp_views.page_item, name="page-item"),
+    path('catalog/', include('catalog.urls')),
 ]
 
 if settings.DEBUG:

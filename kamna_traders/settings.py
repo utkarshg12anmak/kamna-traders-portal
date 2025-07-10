@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     'department',
     "web_pages",
-    
+    'catalog',    
 ]
 
 AUTH_USER_MODEL = "accounts.User"
