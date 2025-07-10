@@ -1,18 +1,17 @@
 {# templates/components/button.html #}
-
 <style>
-/* button-plus component */
 .button-plus {
   position: relative;
   width: 150px;
   height: 40px;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  /* border and background from variables */
-  border: 1px solid {{ dark_color|default:'#34974d' }};
-  background-color: {{ color|default:'#3aa856' }};
+  /* use CSS variables for colors */
+  border: 1px solid var(--dark-color, #34974d);
+  background-color: var(--color, #3aa856);
   transition: all 0.3s;
+  margin-left: 10px;
 }
 .button-plus__text {
   transform: translateX(30px);
@@ -25,8 +24,7 @@
   transform: translateX(109px);
   height: 100%;
   width: 39px;
-  /* icon background uses darker variant */
-  background-color: {{ dark_color|default:'#34974d' }};
+  background-color: var(--dark-color, #34974d);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,9 +34,8 @@
   width: 30px;
   stroke: #fff;
 }
-/* hover state uses dark_color */
 .button-plus:hover {
-  background-color: {{ dark_color|default:'#34974d' }};
+  background-color: var(--dark-color, #34974d);
 }
 .button-plus:hover .button-plus__text {
   color: transparent;
@@ -47,18 +44,18 @@
   width: 148px;
   transform: translateX(0);
 }
-/* active state keeps dark_color */
 .button-plus:active .button-plus__icon {
-  background-color: {{ dark_color|default:'#34974d' }};
+  background-color: var(--dark-color, #2e8644);
 }
 .button-plus:active {
-  border: 1px solid {{ dark_color|default:'#34974d' }};
+  border: 1px solid var(--dark-color, #2e8644);
 }
 </style>
 
 <button
   type="{{ type|default:'button' }}"
   class="button-plus {{ class|default:'' }}"
+  style="--color: {{ color|default:'#3aa856' }}; --dark-color: {{ dark_color|default:'#34974d' }};"
 >
   <span class="button-plus__text">{{ text }}</span>
   <span class="button-plus__icon">
