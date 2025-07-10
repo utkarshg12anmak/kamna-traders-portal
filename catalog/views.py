@@ -6,6 +6,8 @@ from .models import Category, UnitOfMeasure, TaxRate, Brand, Item, ItemImage, UP
 from django.views.generic import ListView
 from django.template.loader import render_to_string   # ← add this
 from .forms import BrandForm
+from django.urls import reverse
+from .models import Brand
 from .serializers import (
     CategorySerializer, UnitOfMeasureSerializer, TaxRateSerializer, 
     BrandSerializer, ItemSerializer, ItemImageSerializer, UPCSerializer
@@ -52,11 +54,9 @@ class ItemListView(ListView):
     template_name = "catalog/items.html"
     context_object_name = "object_list"
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["brand_form"]       = BrandForm()
-        ctx["brands"]           = Brand.objects.all()
-        ctx["brand_create_url"] = reverse("catalog:brand-create")
+    def get_context_data(self, **ctx):
+        ctx = super().get_context_data(**ctx)
+        ctx['brand_create_url'] = reverse('catalog:brand-bulk-create')
         return ctx
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -107,3 +107,18 @@ class ItemViewSet(viewsets.ModelViewSet):
     ).prefetch_related('images','upcs')
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+from django.views.decorators.http import require_POST
+from django.shortcuts import redirect
+from .models import Brand
+
+@require_POST
+def bulk_create_brands(request):
+    # Grab all inputs named "brand_name" (we’ll name them that in the form)
+    names = request.POST.getlist('brand_name')
+    # Strip/ignore blanks
+    names = [n.strip() for n in names if n.strip()]
+    # Bulk create those brands
+    Brand.objects.bulk_create([Brand(name=n) for n in names])
+    # Redirect back to your items page
+    return redirect('catalog:item-list')  # adjust to your actual URL name

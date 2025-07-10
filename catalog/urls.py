@@ -1,11 +1,15 @@
 # catalog/urls.py
 
 from django.urls import path
+from . import views
 from django.views.generic import RedirectView
 from .views import CatalogHomeView
 from .views import CatalogItemView
 from rest_framework.routers import DefaultRouter
 from .views import CategoryViewSet, UnitOfMeasureViewSet, TaxRateViewSet, BrandViewSet, ItemViewSet
+
+app_name = 'catalog'
+
 
 router = DefaultRouter()
 router.register('categories', CategoryViewSet)
@@ -26,5 +30,6 @@ urlpatterns = [
     path('home/', CatalogHomeView.as_view(), name='catalog-home'),
     path('items/', CatalogItemView.as_view(), name='catalog-items'),
     path('bom/', CatalogHomeView.as_view(), name='catalog-bom'),
+    path('brands/bulk-create/', views.bulk_create_brands, name='brand-bulk-create'),
 
 ]

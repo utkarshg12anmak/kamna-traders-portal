@@ -1,0 +1,57 @@
+{# templates/components/modal_dynamic.html #}
+<style>
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+                   align-items: center; justify-content: center; z-index:1000 }
+  .modal-box     { background: #fff; width: {{ width|default:"600px" }};
+                   max-height: {{ height|default:"80vh" }};
+                   display:flex; flex-direction:column; border-radius:8px; overflow:hidden }
+  .modal-header  { background: var(--modal-bg,#0077b6); color:#fff; padding:1rem;
+                   display:flex; justify-content:space-between; align-items:center }
+  .modal-body    { flex:1; padding:1rem; overflow-y:auto }
+  .modal-footer  { padding:1rem; border-top:1px solid #eee; text-align:right }
+  .btn-sm        { padding:0.5rem 1rem; border:none; border-radius:4px; cursor:pointer }
+  .btn-add       { background:#eee; margin-right:1rem }
+  .btn-save      { background: var(--modal-bg,#0077b6); color:#fff }
+  .brand-input   { display:flex; gap:0.5rem; margin-bottom:0.5rem }
+  .brand-input input { flex:1; padding:0.5rem; border:1px solid #ccc; border-radius:4px }
+</style>
+
+<div id="{{ id }}" class="modal-overlay" onclick="if(event.target===this) closeModal('{{ id }}')">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="color:#fff;">Add / Edit Brands</h2>
+      <button class="modal-close-btn" onclick="closeModal('{{ id }}')">&times;</button>
+    </div>
+    <form
+      class="modal-body"
+      method="post"
+      action="{{ bulk_url }}"
+    >
+      {% csrf_token %}
+
+      {# 1 input always present #}
+      <div class="mb-2">
+        <input
+          type="text"
+          name="brand_name"
+          placeholder="Brand name"
+          class="filter-input"
+        />
+      </div>
+
+      {# If you want an “add more” button that duplicates this field, you can add JS here… #}
+      <button type="button" onclick="
+        const div = this.previousElementSibling.cloneNode(true);
+        div.querySelector('input').value = '';
+        this.parentNode.insertBefore(div, this);
+      ">+ Add Brand</button>
+      
+      <div class="modal-footer">
+        <button type="submit" class="button-plus"
+                style="--color:#0077b6;--dark-color:#005f99">
+          Save Brands
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

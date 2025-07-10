@@ -38,14 +38,14 @@ media="(prefers-color-scheme: dark)"
 
 {% include "components/button-plus.html" with text="Brand" type="button" onclick="openModal('brandModal')" class="ml-2" color="#0077b6" dark_color="#023e8a"%}         
 
-{% include "components/modal.html" with id="brandModal" title="Add / Edit Brand" action=brand_create_url form=brand_form list_items=brands list_label="Brands" header_bg_color="#0077b6" width="600px" height="80vh" submit_text="Save Brand"%}
-
 {% include "components/button-plus.html" with text="Categories" type="button" class="ml-2" color="#d8572a" dark_color="#c32f27"%}         
 
 {% include "components/button-plus.html" with text="Tax Rates" type="button" class="ml-2" color="#8d99ae" dark_color="#2b2d42"%}         
 
 {% include "components/button-plus.html" with text="UOM" type="button" class="ml-2" color="#ff4d6d" dark_color="#c9184a"%}         
 
+
+{% include "components/modal_dynamic.html" with id="brandModal" title="Add / Edit Brands" width="500px" height="60vh" save_text="Save Brands" action_url=brand_create_url %}
 
 </div>
 </div>
