@@ -259,6 +259,7 @@
     .info .name {
     font-weight: 600;
     color: var(--text-dark);
+    font-size: 1.1rem;
     
     }
     .info .designation {
@@ -318,36 +319,15 @@
 
     <div class="section-title">Menu</div>
     <nav>
-      <ul>
-        {% for child in nav_items %}
-          <li class="has-submenu {% if child == current_item %}open{% endif %}">
-            <a href="{{ child.get_absolute_url }}"
-               class="nav-link {% if child == current_item %}active{% endif %}">
-                <span class="nav-icon">
-                <img
-                    src="{% static child.icon_name %}"
-                    alt="{{ child.name }}"
-                    aria-hidden="true"
-                />
-                </span>
-              <span class="nav-label">{{ child.name }}</span>
-            </a>
-
-            {% if child.children.all %}
-              <ul class="submenu">
-                {% for sub in child.children.all %}
-                  <li>
-                    <a href="{{ sub.get_absolute_url }}"
-                       class="{% if request.path == sub.get_absolute_url %}active{% endif %}">
-                      {{ sub.name }}
-                    </a>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
+        <ul>
+            {% for nav in nav_items %}
+                <li class="{% if nav.url == request.path %}active{% endif %}">
+                <a href="{{ nav.url }}">
+                    {{ nav.name }}
+                </a>
+                </li>
+            {% endfor %}
+            </ul>
     </nav>
 
     
