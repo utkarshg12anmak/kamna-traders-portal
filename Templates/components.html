@@ -995,3 +995,44 @@
         } 
 </style>
 
+<style>
+
+/* Button component styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+  border-color: #d0d0d0;
+}
+.btn-secondary:hover { background-color: #e0e0e0; }
+.btn-danger {
+  background-color: var(--danger-color);
+  color: #fff;
+  border-color: var(--danger-color);
+}
+.btn-danger:hover { filter: brightness(1.1); }
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+</style>
