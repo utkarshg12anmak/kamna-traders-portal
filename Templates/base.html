@@ -216,12 +216,26 @@
     align-items: center;
     gap: 16px;
     }
+    /* base avatar size & shape */
     .avatar {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     border: 2px solid #fff;
+    overflow: hidden;
     }
+
+    /* when showing initials */
+    .avatar--initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color); /* or pick any brand color */
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    }
+
     .info .name {
     font-weight: 600;
     color: var(--text-dark);
@@ -316,7 +330,9 @@
     
     <div class="bottom-group">
       <div class="profile">
-        <img src="{% static 'profile-user.png' %}" alt="Avatar" class="avatar"/>
+        <div class="avatar avatar--initials">
+            {{ request.session.first_name|slice:":1"|upper }}{{ request.session.last_name|slice:":1"|upper }}
+            </div>
         <div class="info">
           <span class="name">{{ request.session.first_name }} {{ request.session.last_name }}</span> </br>
           <span class="designation">{{ request.session.job_title }}</span>
