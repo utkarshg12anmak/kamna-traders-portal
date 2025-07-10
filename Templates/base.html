@@ -10,7 +10,21 @@
 
   <title>{% block title %}{{ current_item.name }} – Kamna Traders{% endblock %}</title>
 
-  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    <!-- Favicon -->
+    <link
+    rel="icon"
+    href="{% static 'favicon_dark.svg' %}"
+    type="image/svg+xml"
+    media="(prefers-color-scheme: light)"
+    />
+
+    <!-- Dark-mode favicon (shown in browsers using dark theme) -->
+    <link
+        rel="icon"
+        href="{% static 'favicon_light.svg' %}"
+        type="image/svg+xml"
+        media="(prefers-color-scheme: dark)"
+    />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet"/>
@@ -141,13 +155,14 @@
 
     .nav-link.active .nav-icon img,
     .nav-link.active .nav-icon svg {
-    filter: none;
+    
     color: var(--secondary-color);
     filter: drop-shadow(0 0 0 currentColor);
     }
 
     /* Larger pill for active icon */
     .nav-link.active .nav-icon {
+    color: var(--secondary-color);
     position: relative;
     left: -24px;
     width: 56px;
