@@ -21,11 +21,17 @@ class PageItem(models.Model):
         blank=True,
         help_text="Static filename (e.g. 'warehouse.png') under your static folder"
     )
+    order      = models.PositiveIntegerField(
+        default=0,
+        help_text="Display order (smaller numbers come first)"
+    )
 
     class Meta:
         verbose_name = "Web Page Item"
         verbose_name_plural = "Web Page Items"
         ordering = ("parent__id", "name")
+        unique_together = ("parent", "name")
+        ordering = ["parent__id", "order", "name"]
 
     def __str__(self):
         return self.name

@@ -27,7 +27,7 @@ def page_item(request, slug):
     )
 
     # Its direct children become the sidebar nav
-    nav_items = item.children.all().order_by("name")
+    nav_items = item.children.all().order_by("order", "name")
 
     return render(request, "base.html", {
         "current_item": item,
