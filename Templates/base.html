@@ -8,6 +8,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token }}">
 
+  
+
   <title>{% block title %}{{ current_item.name }} – Kamna Traders{% endblock %}</title>
 
     <!-- Favicon -->
@@ -165,15 +167,6 @@
     padding: 32px;
     margin-right: 16px;
     }
-    .main h1 {
-    font-size: 1.75rem;
-    color: var(--text-dark);
-    margin-bottom: 8px;
-    }
-    .main p {
-    color: var(--text-medium);
-    margin-bottom: 24px;
-    }
 
         /* ==== NAV LINKS ==== */
     nav ul {
@@ -252,7 +245,7 @@
     }
     .nav-link.active {
       color: var(--secondary-color);
-      font-weight: 600;
+      font-weight: 500;
     }
     .nav-link.active::before {
       background: var(--secondary-color);
