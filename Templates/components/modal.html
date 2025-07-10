@@ -21,7 +21,7 @@
   }
   .modal-content {
     background: white;
-    border-radius: 8px;
+    border-radius: 20px;
     width: {{ width }};
     height: {{ height }};
     display: flex;
@@ -35,6 +35,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: var(--modal-header-bg, #0077b6); /* default if none passed */
+    color: #fff; 
   }
   .modal-body {
     flex: 1 1 auto;
@@ -53,13 +55,14 @@
     font-size: 1.5rem;
     cursor: pointer;
     line-height: 1;
+    color: #fff;
   }
 </style>
 
 <div id="{{ id }}" class="modal-overlay" onclick="if(event.target===this) closeModal('{{ id }}')">
   <div class="modal-content">
-    <div class="modal-header">
-      <h2>{{ title }}</h2>
+    <div class="modal-header" style="--modal-header-bg: {{ header_bg|default:'#0077b6' }};">
+      <h2 style="color: white !important;">{{ title }}</h2>
       <button class="modal-close-btn" onclick="closeModal('{{ id }}')">&times;</button>
     </div>
     <div class="modal-body">
