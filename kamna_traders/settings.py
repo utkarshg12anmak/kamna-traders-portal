@@ -201,14 +201,5 @@ AWS_S3_OBJECT_PARAMETERS  = {"CacheControl": "max-age=86400"}
 # 4) Bucket folder prefix
 FOLDER_PREFIX = "kamna-traders-prod" if ENVIRONMENT == "prod" else "kamna-traders-dev"
 
-# 5) URLs
-STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{FOLDER_PREFIX}/static/"
-MEDIA_URL  = f"https://{AWS_S3_CUSTOM_DOMAIN}/{FOLDER_PREFIX}/media/"
-
-STATICFILES_STORAGE = (
-    "catalog.storages.StaticStorage"
-    if ENVIRONMENT == "prod"
-    else "whitenoise.storage.CompressedManifestStaticFilesStorage"
-)
 
 DEFAULT_FILE_STORAGE = "catalog.storages.MediaStorage"

@@ -59,3 +59,37 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
+from rest_framework import viewsets, permissions
+from .models import Category, UnitOfMeasure, TaxRate, Brand, Item
+from .serializers import (
+    CategorySerializer, UnitOfMeasureSerializer, TaxRateSerializer,
+    BrandSerializer, ItemSerializer
+)
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class UnitOfMeasureViewSet(viewsets.ModelViewSet):
+    queryset = UnitOfMeasure.objects.all()
+    serializer_class = UnitOfMeasureSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class TaxRateViewSet(viewsets.ModelViewSet):
+    queryset = TaxRate.objects.all()
+    serializer_class = TaxRateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class BrandViewSet(viewsets.ModelViewSet):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all().select_related(
+        'l1_category','l2_category','uom','gst_rate','brand'
+    ).prefetch_related('images','upcs')
+    serializer_class = ItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
