@@ -1,1 +1,26 @@
-Hi 
+{# templates/Catalog/home.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{# Optional: override the <title> (if base.html offers a title block) #}
+{% block title %}Catalog Home{% endblock %}
+
+{% block content %}
+  <div class="catalog-home">
+    <h1>Catalog Home</h1>
+    <p>Welcome to the Catalog section—select an item from the sidebar to get started.</p>
+
+    {# Example KPI cards or widgets grid #}
+    <div class="catalog-widgets">
+      <div class="widget-card">
+        <h2>Total Products</h2>
+        <p>--</p>
+      </div>
+      <div class="widget-card">
+        <h2>Featured Categories</h2>
+        <p>--</p>
+      </div>
+      <!-- add more cards as needed -->
+    </div>
+  </div>
+{% endblock %}
