@@ -3,9 +3,10 @@
 from django.contrib import admin
 from .models import PageItem
 
+
 @admin.register(PageItem)
 class PageItemAdmin(admin.ModelAdmin):
-    list_display  = ("name", "parent", "order", "icon_name")
+    list_display  = ("name", "parent", "order", "icon_name",'redirect_url')
     list_filter  = ("parent",)
     search_fields = ("name", "icon_name")
     list_editable = ("order",)

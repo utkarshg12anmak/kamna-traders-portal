@@ -25,6 +25,11 @@ class PageItem(models.Model):
         default=0,
         help_text="Display order (smaller numbers come first)"
     )
+    redirect_url = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional path (e.g. '/catalog/home/') or URL name"
+    )
 
     class Meta:
         verbose_name = "Web Page Item"
@@ -32,6 +37,15 @@ class PageItem(models.Model):
         ordering = ("parent__id", "name")
         unique_together = ("parent", "name")
         ordering = ["parent__id", "order", "name"]
+
+    @property
+    def url(self):
+        """
+        If redirect_url is set, use that; otherwise fall back to default.
+        """
+        if self.redirect_url:
+            return self.redirect_url
+        return self.get_absolute_url()
 
     def __str__(self):
         return self.name

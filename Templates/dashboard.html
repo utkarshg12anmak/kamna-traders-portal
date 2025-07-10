@@ -214,7 +214,7 @@
   <div class="dashboard-grid">
     {% for item in dashboard_items %}
       <a
-        href="{{ item.get_absolute_url }}"
+        href="{{ item.url }}"
         class="dashboard-item{% if item.id not in allowed_page_ids %} disabled{% endif %}"
         {% if item.id not in allowed_page_ids %}aria-disabled="true"{% endif %}
       >
