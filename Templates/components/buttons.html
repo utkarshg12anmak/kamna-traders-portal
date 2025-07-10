@@ -1,0 +1,25 @@
+{# templates/components/button.html #}
+{#
+  A reusable button component.
+
+  Usage:
+    {% include "components/button.html" with
+         text="Save"
+         type="submit"
+         variant="primary"
+         class="ml-2"
+    %}
+
+  Parameters:
+    text    - the button label (required)
+    type    - HTML button type attribute (button, submit, reset). Defaults to "button".
+    variant - visual style variant (e.g. "primary", "secondary", "danger").
+    class   - any additional CSS classes to append.
+#}
+
+<button
+  type="{{ type|default:"button" }}"
+  class="btn{% if variant %} btn-{{ variant }}{% endif %} {{ class|default:"" }}"
+>
+  {{ text }}
+</button>

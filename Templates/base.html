@@ -164,7 +164,7 @@
     background: #fff;
     border-radius: 16px 0 0 16px;
     overflow-y: auto;
-    padding: 32px;
+    padding: 16px;
     margin-right: 16px;
     }
 
@@ -328,4 +328,84 @@
     });
   </script>
 </body>
+
+<style>
+    /* ==========================================================================
+   Page Header
+   — flex container for a title + optional actions (buttons, links, etc.)
+   ========================================================================== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem ;               /* inner spacing */
+  margin-bottom: 1rem;       /* gap below header */
+  background-color: #F0F2F5 ;   /* light surface */  
+  border-radius: 10px;
+}
+
+/* If you use an <h1> inside, you can zero-out its margin: */
+.page-header > h1,
+.page-header > h2,
+.page-header > h3 {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Filters
+   — container for search controls, dropdowns, date‐pickers, etc.
+   ========================================================================== */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;                   /* space between filter controls */
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #F0F2F5;
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   Tables
+   — scrollable container for one or more data tables
+   ========================================================================== */
+.tables {
+  padding: 1rem;
+  background-color: #F0F2F5;
+  border-radius: 10px;
+  overflow-x: auto; 
+  flex: 1;  
+  display: flex; 
+}
+
+/* Optional: style tables inside .tables for consistent look */
+.tables table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tables th,
+.tables td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tables th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.page-title {
+    align-items: center;
+}
+
+.page-subtitle {
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+</style>
 </html>
+
