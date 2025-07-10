@@ -3,9 +3,13 @@ from django.views.generic import TemplateView
 from web_pages.models import PageItem
 from rest_framework import viewsets, permissions
 from .models import Category, UnitOfMeasure, TaxRate, Brand, Item, ItemImage, UPC
+from django.views.generic import ListView
+from django.template.loader import render_to_string   # ← add this
+from .forms import BrandForm
 from .serializers import (
     CategorySerializer, UnitOfMeasureSerializer, TaxRateSerializer, 
     BrandSerializer, ItemSerializer, ItemImageSerializer, UPCSerializer
+    
 )
 class CatalogHomeView(TemplateView):
     template_name = 'Catalog/home.html'
@@ -40,9 +44,29 @@ class CatalogItemView(TemplateView):
         # push it & its children into the template
         ctx['current_item'] = catalog
         ctx['nav_items']    = catalog.children.all().order_by('order', 'name')
-
+        
         return ctx
     
+class ItemListView(ListView):
+    model = Item
+    template_name = "catalog/items.html"
+    context_object_name = "object_list"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        # render the brand form and footer into strings
+        brand_form_html = render_to_string("catalog/_brand_form.html", {
+            "form": BrandForm()
+        }, request=self.request)
+        brand_footer_html = render_to_string("catalog/_brand_footer.html", {}, request=self.request)
+
+        # pass them into the template context
+        ctx.update({
+            "brand_form_html":   brand_form_html,
+            "brand_footer_html": brand_footer_html,
+        })
+        return ctx
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

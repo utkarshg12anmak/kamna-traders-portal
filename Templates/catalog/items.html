@@ -33,7 +33,10 @@ media="(prefers-color-scheme: dark)"
         </h1>
         <div class="action-buttons">                    
 
-{% include "components/button-plus.html" with text="Item" type="button" class="ml-2" color="#3aa856" dark_color="#34974d"%}
+
+{% include "components/button-plus.html" with text="Item" type="button" onclick="openModal('brandModal')" class="ml-2" color="#3aa856" dark_color="#34974d"%}
+
+{% include "components/modal.html" with id="brandModal" title="Add / Edit Brand" width="600px" height="80vh" body=brand_form_html footer=brand_footer_html%}
 
 {% include "components/button-plus.html" with text="Brand" type="button" class="ml-2" color="#0077b6" dark_color="#023e8a"%}         
     
@@ -42,17 +45,19 @@ media="(prefers-color-scheme: dark)"
 {% include "components/button-plus.html" with text="Tax Rates" type="button" class="ml-2" color="#8d99ae" dark_color="#2b2d42"%}         
 
 {% include "components/button-plus.html" with text="UOM" type="button" class="ml-2" color="#ff4d6d" dark_color="#c9184a"%}         
+
+
 </div>
 </div>
 
 <!-- 2b) FILTERS -->
 <div class="filters">
-    <a href="" class="btn btn-primary">Filters</a>
+    <p>Filters go here</p>
 </div>
 
 <!-- 2c) TABLES -->
 <div class="tables">
-    <a href="" class="btn btn-primary">Tables</a>
+    <p>Tables go here</p>
 </div>
 
 </section>
