@@ -334,12 +334,17 @@
 
 <script>
   function openModal(id) {
-    document.getElementById(id).style.display = 'flex';
+    const m = document.getElementById(id);
+    if (!m) { console.error(`no modal with id=${id}`); return; }
+    m.style.display = 'flex';
   }
   function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
+    const m = document.getElementById(id);
+    if (!m) { console.error(`no modal with id=${id}`); return; }
+    m.style.display = 'none';
   }
 </script>
+
 
 
 </body>

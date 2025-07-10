@@ -55,6 +55,9 @@
 <button
   type="{{ type|default:'button' }}"
   class="button-plus {{ class|default:'' }}"
+    {% if onclick %}
+    onclick="{{ onclick }}"
+  {% endif %}
   style="--color: {{ color|default:'#3aa856' }}; --dark-color: {{ dark_color|default:'#34974d' }};"
 >
   <span class="button-plus__text">{{ text }}</span>
@@ -65,3 +68,4 @@
     </svg>
   </span>
 </button>
+
