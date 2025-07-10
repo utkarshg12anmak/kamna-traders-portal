@@ -1,0 +1,30 @@
+{# templates/Catalog/home.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Catalog Home{% endblock %}
+
+{% block extra_head %}
+  {# page-specific favicons, scripts, etc. #}
+  <link
+    rel="icon"
+    href="{% static 'favicon_dark.svg' %}"
+    type="image/svg+xml"
+    media="(prefers-color-scheme: light)"
+  />
+  <link
+    rel="icon"
+    href="{% static 'favicon_light.svg' %}"
+    type="image/svg+xml"
+    media="(prefers-color-scheme: dark)"
+  />
+{% endblock %}
+
+{% block content %}
+
+  <div class="catalog-home">
+    <h1 class="page-title">Manage Items</h1>
+
+    </div>
+  </div>
+{% endblock %}
