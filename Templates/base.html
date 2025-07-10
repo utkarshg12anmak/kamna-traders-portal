@@ -72,139 +72,6 @@
     position: relative;
     }
 
-/* ==== NAV LINKS ==== */
-.nav-link {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    text-decoration: none;
-    padding: 8px 12px 8px 16px; /* combine padding and left-padding */
-    border-radius: 8px;
-    color: rgba(0,0,0,0.5); /* Default text color (greyed out) */
-    transition: background 0.2s, color 0.2s;
-}
-
-.nav-link::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 24px;
-    border-radius: 2px;
-    background: transparent;
-    transition: background 0.2s;
-}
-
-.nav-link .nav-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: transparent;
-    transition: background 0.2s;
-}
-
-/* PNGs stay greyed-out by default */
-.nav-icon img {
-    transition: filter 0.2s;
-    filter: grayscale(100%) opacity(0.6);
-    width: 24px;
-    height: 24px;
-}
-
-/* SVG icons: inherit the link’s color, and size them */
-.nav-icon svg {
-    fill: currentColor; /* SVGs will take on the parent's text color */
-    transition: fill 0.2s; /* Transition the fill property */
-    width: 24px;
-    height: 24px;
-}
-
-/* Hover & focus for the link */
-.nav-link:hover,
-.nav-link:focus {
-    background: rgba(0, 0, 0, 0.04);
-    color: var(--secondary-color); /* This changes the text color and currentColor for SVGs */
-}
-
-.nav-link:hover::before,
-.nav-link:focus::before {
-    background: var(--secondary-color);
-}
-
-/* --- ICON SPECIFIC STYLES ON HOVER/FOCUS/ACTIVE --- */
-
-/* PNGs on hover/focus/active: Remove grayscale and set opacity to full */
-.nav-link:hover .nav-icon img,
-.nav-link:focus .nav-icon img,
-.nav-link.active .nav-icon img {
-    filter: grayscale(0%) opacity(1);
-}
-
-/* SVGs on hover/focus/active: Color change is handled by the parent's 'color' property, but we can explicitly set fill */
-.nav-link:hover .nav-icon svg,
-.nav-link:focus .nav-icon svg,
-.nav-link.active .nav-icon svg {
-    fill: var(--secondary-color); /* Ensure SVGs are filled with the secondary color */
-}
-
-
-/* Active state for the link */
-.nav-link.active {
-    color: var(--secondary-color); /* Ensures text color and SVGs using currentColor are red */
-}
-
-.nav-link.active::before {
-    background: var(--secondary-color);
-}
-
-.nav-link.active .nav-icon {
-    background: var(--secondary-color);
-}
-
-/* Larger pill for active icon */
-.nav-link.active .nav-icon {
-    position: relative;
-    left: -24px;
-    width: 56px;
-    height: 40px;
-    border-radius: 0 20px 20px 0;
-    justify-content: center;
-}
-
-    /* submenu */
-    .submenu {
-    list-style: none;
-    margin: 4px 0 4px 48px;
-    display: none;
-    }
-    .has-submenu.open > .submenu,
-    .has-submenu:hover  > .submenu {
-    display: block;
-    }
-    .submenu li {
-    margin: 8px 0;
-    }
-    .submenu li a {
-    display: block;
-    padding: 6px 12px;
-    font-size: 0.95rem;
-    color: var(--text-light);
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background 0.2s;
-    }
-    .submenu li a:hover,
-    .submenu li a.active {
-    background: rgba(0,0,0,0.04);
-    color: var(--primary-color);
-    }
-
     /* section titles */
     .section-title {
     text-transform: uppercase;
@@ -308,6 +175,92 @@
     margin-bottom: 24px;
     }
 
+        /* ==== NAV LINKS ==== */
+    nav ul {
+      list-style: none;
+    }
+    nav li {
+      margin: 12px 0;
+      position: relative;
+    }
+
+    .nav-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      padding: 8px 12px 8px 16px;
+      border-radius: 8px;
+      color: rgba(0,0,0,0.5);
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-link::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 24px;
+      border-radius: 2px;
+      background: transparent;
+      transition: background 0.2s;
+    }
+
+    .nav-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: transparent;
+      transition: background 0.2s;
+    }
+    .nav-icon img {
+      filter: grayscale(100%) opacity(0.6);
+      width: 24px;
+      height: 24px;
+      transition: filter 0.2s;
+    }
+    .nav-link svg {
+      fill: currentColor;
+      width: 24px;
+      height: 24px;
+      transition: fill 0.2s;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--secondary-color);
+    }
+    .nav-link:hover::before,
+    .nav-link:focus::before {
+      background: var(--secondary-color);
+    }
+    .nav-link:hover .nav-icon img,
+    .nav-link:focus .nav-icon img,
+    .nav-link.active .nav-icon img {
+      filter: grayscale(0%) opacity(1);
+    }
+    .nav-link:hover svg,
+    .nav-link:focus svg,
+    .nav-link.active svg {
+      fill: var(--secondary-color);
+    }
+    .nav-link.active {
+      color: var(--secondary-color);
+      font-weight: 600;
+    }
+    .nav-link.active::before {
+      background: var(--secondary-color);
+    }
+    .nav-link.active .nav-icon {      
+      justify-content: center;
+    }
+
   </style>
 </head>
 <body>
@@ -319,15 +272,23 @@
 
     <div class="section-title">Menu</div>
     <nav>
-        <ul>
-            {% for nav in nav_items %}
-                <li class="{% if nav.url == request.path %}active{% endif %}">
-                <a href="{{ nav.url }}">
-                    {{ nav.name }}
-                </a>
-                </li>
-            {% endfor %}
-            </ul>
+      <ul>
+        {% for nav in nav_items %}
+          <li>
+            <a
+              href="{{ nav.url }}"
+              class="nav-link{% if nav.url == request.path %} active{% endif %}"
+            >
+              {% if nav.icon_name %}
+                <div class="nav-icon">
+                  <img src="{% static nav.icon_name %}" alt="{{ nav.name }}"/>
+                </div>
+              {% endif %}
+              {{ nav.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
     </nav>
 
     
