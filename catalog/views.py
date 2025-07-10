@@ -54,20 +54,10 @@ class ItemListView(ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
-        # render the brand form and footer into strings
-        brand_form_html = render_to_string("catalog/_brand_form.html", {
-            "form": BrandForm()
-        }, request=self.request)
-        brand_footer_html = render_to_string("catalog/_brand_footer.html", {}, request=self.request)
-
-        # pass them into the template context
-        ctx.update({
-            "brand_form_html":   brand_form_html,
-            "brand_footer_html": brand_footer_html,
-        })
+        ctx["brand_form"]       = BrandForm()
+        ctx["brands"]           = Brand.objects.all()
+        ctx["brand_create_url"] = reverse("catalog:brand-create")
         return ctx
-
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()

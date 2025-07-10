@@ -61,17 +61,55 @@
 
 <div id="{{ id }}" class="modal-overlay" onclick="if(event.target===this) closeModal('{{ id }}')">
   <div class="modal-content">
-    <div class="modal-header" style="--modal-header-bg: {{ header_bg|default:'#0077b6' }};">
+    <div class="modal-header">
       <h2 style="color: white !important;">{{ title }}</h2>
       <button class="modal-close-btn" onclick="closeModal('{{ id }}')">&times;</button>
     </div>
+
     <div class="modal-body">
-      {{ body|safe }}
+      <form
+        id="{{ id }}-form"
+        action="{{ action }}"
+        method="{{ method|default:'post' }}"
+        {% if enctype %}enctype="{{ enctype }}"{% endif %}
+      >
+        {% csrf_token %}
+
+        {# Render every field in the form #}
+        {% for field in form %}
+          <div class="mb-4">
+            {{ field.label_tag }}
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+
+        {# Optional listing of existing items #}
+        {% if list_items %}
+          <hr>
+          <h3 class="font-semibold">{{ list_label|default:"Existing" }}</h3>
+          <ul class="list-disc pl-5 max-h-40 overflow-y-auto">
+            {% for obj in list_items %}
+              <li>{{ obj }}</li>
+            {% empty %}
+              <li class="text-gray-500"> (none) </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </form>
     </div>
-    {% if footer %}
-      <div class="modal-footer">
-        {{ footer|safe }}
-      </div>
-    {% endif %}
+
+    <div class="modal-footer">
+      <button
+        type="submit"
+        form="{{ id }}-form"
+        class="button-plus"
+        style="--color: {{ header_bg_color|default:'#0077b6' }};
+               --dark-color: {{ header_bg_color|default:'#0077b6' }};
+               /* or derive a darker shade here if you want */"
+      >
+        {{ submit_text|default:"Save" }}
+      </button>
+    </div>
   </div>
 </div>

@@ -38,7 +38,7 @@ media="(prefers-color-scheme: dark)"
 
 {% include "components/button-plus.html" with text="Brand" type="button" onclick="openModal('brandModal')" class="ml-2" color="#0077b6" dark_color="#023e8a"%}         
 
-{% include "components/modal.html" with id="brandModal" title="Add / Edit Brand" width="600px" height="80vh" body=brand_form_html header_bg="#023e8a" footer=brand_footer_html%}
+{% include "components/modal.html" with id="brandModal" title="Add / Edit Brand" action=brand_create_url form=brand_form list_items=brands list_label="Brands" header_bg_color="#0077b6" width="600px" height="80vh" submit_text="Save Brand"%}
 
 {% include "components/button-plus.html" with text="Categories" type="button" class="ml-2" color="#d8572a" dark_color="#c32f27"%}         
 
