@@ -3,6 +3,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
+# ---------- Timezone ----------
+TIME_ZONE = 'Asia/Kolkata'
+USE_TZ = True
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,9 +31,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts.apps.AccountsConfig",
+    'storages',
     'department',
     "web_pages",
     'catalog',    
+    "rest_framework",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -109,8 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
-
 USE_I18N = True
 
 USE_TZ = True
@@ -174,3 +178,37 @@ if DEBUG:
     }
 
 LOGOUT_REDIRECT_URL = "login"
+
+# 1) Load the “right” .env file
+ENVIRONMENT = os.getenv("ENVIRONMENT", "dev").lower()
+if ENVIRONMENT == "prod":
+    load_dotenv(BASE_DIR / ".env.prod")
+else:
+    load_dotenv(BASE_DIR / ".env.dev")
+
+
+#3) AWS / S3 Core Settings (all pulled from env)
+AWS_ACCESS_KEY_ID       = os.environ["AWS_ACCESS_KEY_ID"]
+AWS_SECRET_ACCESS_KEY   = os.environ["AWS_SECRET_ACCESS_KEY"]
+AWS_STORAGE_BUCKET_NAME = os.environ["AWS_STORAGE_BUCKET_NAME"]
+AWS_S3_REGION_NAME      = os.getenv("AWS_S3_REGION_NAME", "ap-south-1")
+AWS_S3_SIGNATURE_VERSION  = "s3v4"
+AWS_S3_CUSTOM_DOMAIN      = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+AWS_DEFAULT_ACL           = "public-read"
+AWS_QUERYSTRING_AUTH      = False
+AWS_S3_OBJECT_PARAMETERS  = {"CacheControl": "max-age=86400"}
+
+# 4) Bucket folder prefix
+FOLDER_PREFIX = "kamna-traders-prod" if ENVIRONMENT == "prod" else "kamna-traders-dev"
+
+# 5) URLs
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{FOLDER_PREFIX}/static/"
+MEDIA_URL  = f"https://{AWS_S3_CUSTOM_DOMAIN}/{FOLDER_PREFIX}/media/"
+
+STATICFILES_STORAGE = (
+    "catalog.storages.StaticStorage"
+    if ENVIRONMENT == "prod"
+    else "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
+
+DEFAULT_FILE_STORAGE = "catalog.storages.MediaStorage"
