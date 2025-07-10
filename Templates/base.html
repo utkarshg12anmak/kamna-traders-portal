@@ -72,8 +72,8 @@
     position: relative;
     }
 
-    /* ==== NAV LINKS ==== */
-    .nav-link {
+/* ==== NAV LINKS ==== */
+.nav-link {
     position: relative;
     display: flex;
     align-items: center;
@@ -81,11 +81,11 @@
     text-decoration: none;
     padding: 8px 12px 8px 16px; /* combine padding and left-padding */
     border-radius: 8px;
-    color: rgba(0,0,0,0.5);
+    color: rgba(0,0,0,0.5); /* Default text color (greyed out) */
     transition: background 0.2s, color 0.2s;
-    }
+}
 
-    .nav-link::before {
+.nav-link::before {
     content: "";
     position: absolute;
     left: 0;
@@ -96,9 +96,9 @@
     border-radius: 2px;
     background: transparent;
     transition: background 0.2s;
-    }
+}
 
-    .nav-link .nav-icon {
+.nav-link .nav-icon {
     width: 32px;
     height: 32px;
     display: flex;
@@ -107,69 +107,75 @@
     border-radius: 50%;
     background: transparent;
     transition: background 0.2s;
-    }
+}
 
-    .nav-icon img,
-    .nav-icon svg {
-    transition: filter 0.2s, color 0.2s;
+/* PNGs stay greyed-out by default */
+.nav-icon img {
+    transition: filter 0.2s;
     filter: grayscale(100%) opacity(0.6);
-    width: 25px;
-    height: 25px;
-    /* svg fill inherits currentColor */
-    }
+    width: 24px;
+    height: 24px;
+}
 
-    /* Hover & focus */
-    .nav-link:hover,
-    .nav-link:focus {
+/* SVG icons: inherit the link’s color, and size them */
+.nav-icon svg {
+    fill: currentColor; /* SVGs will take on the parent's text color */
+    transition: fill 0.2s; /* Transition the fill property */
+    width: 24px;
+    height: 24px;
+}
+
+/* Hover & focus for the link */
+.nav-link:hover,
+.nav-link:focus {
     background: rgba(0, 0, 0, 0.04);
-    color: var(--secondary-color);
-    }
+    color: var(--secondary-color); /* This changes the text color and currentColor for SVGs */
+}
 
-    .nav-link:hover::before,
-    .nav-link:focus::before {
+.nav-link:hover::before,
+.nav-link:focus::before {
     background: var(--secondary-color);
-    }
+}
 
-    .nav-link:hover .nav-icon img,
-    .nav-link:focus .nav-icon img,
-    .nav-link:hover .nav-icon svg,
-    .nav-link:focus .nav-icon svg {
-    /* treat PNGs via drop-shadow, SVGs via color */
-    filter: none;
-    color: var(--secondary-color);
-    filter: drop-shadow(0 0 0 currentColor);
-    }
+/* --- ICON SPECIFIC STYLES ON HOVER/FOCUS/ACTIVE --- */
 
-    /* Active state */
-    .nav-link.active {
-    color: var(--secondary-color);
-    }
+/* PNGs on hover/focus/active: Remove grayscale and set opacity to full */
+.nav-link:hover .nav-icon img,
+.nav-link:focus .nav-icon img,
+.nav-link.active .nav-icon img {
+    filter: grayscale(0%) opacity(1);
+}
 
-    .nav-link.active::before {
+/* SVGs on hover/focus/active: Color change is handled by the parent's 'color' property, but we can explicitly set fill */
+.nav-link:hover .nav-icon svg,
+.nav-link:focus .nav-icon svg,
+.nav-link.active .nav-icon svg {
+    fill: var(--secondary-color); /* Ensure SVGs are filled with the secondary color */
+}
+
+
+/* Active state for the link */
+.nav-link.active {
+    color: var(--secondary-color); /* Ensures text color and SVGs using currentColor are red */
+}
+
+.nav-link.active::before {
     background: var(--secondary-color);
-    }
+}
 
-    .nav-link.active .nav-icon {
+.nav-link.active .nav-icon {
     background: var(--secondary-color);
-    }
+}
 
-    .nav-link.active .nav-icon img,
-    .nav-link.active .nav-icon svg {
-    
-    color: var(--secondary-color);
-    filter: drop-shadow(0 0 0 currentColor);
-    }
-
-    /* Larger pill for active icon */
-    .nav-link.active .nav-icon {
-    color: var(--secondary-color);
+/* Larger pill for active icon */
+.nav-link.active .nav-icon {
     position: relative;
     left: -24px;
     width: 56px;
     height: 40px;
     border-radius: 0 20px 20px 0;
     justify-content: center;
-    }
+}
 
     /* submenu */
     .submenu {
@@ -211,6 +217,7 @@
     .bottom-group {
     margin-top: auto;
     }
+
     .profile {
     display: flex;
     align-items: center;
@@ -316,10 +323,13 @@
           <li class="has-submenu {% if child == current_item %}open{% endif %}">
             <a href="{{ child.get_absolute_url }}"
                class="nav-link {% if child == current_item %}active{% endif %}">
-              <span class="nav-icon">
-                <img src="{% static child.icon_name %}"
-                     alt="{{ child.name }}" aria-hidden="true">
-              </span>
+                <span class="nav-icon">
+                <img
+                    src="{% static child.icon_name %}"
+                    alt="{{ child.name }}"
+                    aria-hidden="true"
+                />
+                </span>
               <span class="nav-label">{{ child.name }}</span>
             </a>
 
