@@ -59,6 +59,7 @@
     {% if onclick %}
     onclick="{{ onclick }}"
   {% endif %}
+  {% if data_open %}data-open="{{ data_open }}"{% endif %}
   style="--color: {{ color|default:'#3aa856' }}; --dark-color: {{ dark_color|default:'#34974d' }};"
 >
   <span class="button-plus__text">{{ text }}</span>

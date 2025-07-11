@@ -1,0 +1,18 @@
+{# components/modal-form.html #}
+<div id="{{ modal_id }}" class="modal-overlay">
+  <div class="modal-box">
+    <span class="close-btn" data-close="{{ modal_id }}">&times;</span>
+    <h3>{{ title }}</h3>
+    <form id="{{ form_id }}"
+          method="post"
+          action="{{ action_url }}"
+          class="modal-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="modal-footer">
+        <button type="button" data-close="{{ modal_id }}" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
