@@ -1,4 +1,4 @@
-{# templates/Catalog/items.html #}
+{# templates/Catalog/brands.html #}
 {% extends "base.html" %}
 {% load static %}
 
@@ -28,13 +28,13 @@ media="(prefers-color-scheme: dark)"
     <!-- 2a) PAGE HEADER: Title + Record count + Buttons -->
     <div class="page-header">
         <h1 class="page-title">
-            Manage Items
+            Manage Brands
             <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
         </h1>
         <div class="action-buttons">                    
 
 
-{% include "components/button-plus.html" with text="Item" type="button"  class="ml-2" color="#3aa856" dark_color="#34974d"%}
+{% include "components/button-plus.html" with text="Brands" type="button"  class="ml-2" color="#3aa856" dark_color="#34974d"%}
 
 
 </div>

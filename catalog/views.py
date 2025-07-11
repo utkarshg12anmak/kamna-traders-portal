@@ -32,15 +32,6 @@ class ItemListView(ListView):
     template_name = "Catalog/items.html"
     context_object_name = "object_list"
 
-    def get_taxrate_formset(self, data=None):
-        TaxRateFormSet = modelformset_factory(
-            TaxRate,
-            fields=("name", "rate"),    # adjust field names
-            extra=1,
-            can_delete=True
-        )
-        return TaxRateFormSet(data or None, queryset=TaxRate.objects.all())
-
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["taxrate_formset"] = self.get_taxrate_formset()
@@ -55,7 +46,7 @@ class ItemListView(ListView):
         return self.render_to_response(self.get_context_data(taxrate_formset=formset))
 
 class CatalogItemView(TemplateView):
-    template_name = "catalog/items.html"
+    template_name = "Catalog/items.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -109,3 +100,27 @@ def manage_uoms(request):
     return render(request, 'catalog/uom_manage_popup.html', {
         'formset': formset
     })
+
+# Add Manage Brands 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
+from .models import Brand
+
+class BrandListView(LoginRequiredMixin, TemplateView):
+    template_name = "catalog/brands.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        # look up your top-level “Catalog” page
+        catalog = PageItem.objects.get(
+            name__iexact="Catalog",
+            parent__isnull=True
+        )
+
+        # push it & its children into the template
+        ctx["current_item"] = catalog
+        ctx["nav_items"]    = catalog.children.all().order_by("order", "name")
+        return ctx
+
+

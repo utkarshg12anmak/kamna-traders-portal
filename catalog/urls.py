@@ -9,6 +9,7 @@ from .views import ItemListView
 from rest_framework.routers import DefaultRouter
 from .views import TaxRateViewSet
 from .views import manage_uoms
+from .views import BrandListView
 
 
 app_name = 'catalog'
@@ -29,8 +30,8 @@ urlpatterns = [
     # Your actual home page
     path('home/', CatalogHomeView.as_view(), name='catalog-home'),
     path('items/', CatalogItemView.as_view(), name='catalog-items'),
-    path('bom/', CatalogHomeView.as_view(), name='catalog-bom'),
-    path("catalog/items/", ItemListView.as_view(), name="catalog-items"),
+    path('brands/', BrandListView.as_view(), name='catalog-brands'),
+    path('bom/', CatalogHomeView.as_view(), name='catalog-bom'),     
     path("api/", include(router.urls)),
     path('manage-uoms/', manage_uoms, name='manage_uoms'),
 

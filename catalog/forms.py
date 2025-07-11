@@ -17,3 +17,7 @@ UnitOfMeasureFormSet = modelformset_factory(
     extra=2,          # two blank forms to start
     can_delete=True   # allow marking rows for deletion
 )
+
+# Create Edit Brands
+from .models import Brand
+
