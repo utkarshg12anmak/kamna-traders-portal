@@ -55,7 +55,7 @@
       {% for row in rows %}
         <tr>
           {% for col in columns %}
-            <td>{{ row|default_if_none:''|dict_get:col.key }}</td>
+            <td>{{ row|default_if_none:''|dict_get:col.key|render_cell }}</td>
           {% endfor %}
         </tr>
       {% endfor %}

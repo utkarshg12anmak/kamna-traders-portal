@@ -13,3 +13,14 @@ def dict_get(obj, key):
     except Exception:
         # fallback to attribute lookup
         return getattr(obj, key, '')
+
+@register.filter
+def render_cell(value):
+    """
+    If this is a User (has get_full_name), show full name (fallback to username).
+    Otherwise return the value as-is.
+    """
+    if hasattr(value, 'get_full_name'):
+        full = value.get_full_name()
+        return full or str(value)
+    return value
