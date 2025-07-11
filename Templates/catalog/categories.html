@@ -1,0 +1,52 @@
+{# templates/Catalog/categories.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Catalog Home{% endblock %}
+
+{% block extra_head %}
+{# page-specific favicons, scripts, etc. #}
+<link
+rel="icon"
+href="{% static 'favicon_dark.svg' %}"
+type="image/svg+xml"
+media="(prefers-color-scheme: light)"
+/>
+<link
+rel="icon"
+href="{% static 'favicon_light.svg' %}"
+type="image/svg+xml"
+media="(prefers-color-scheme: dark)"
+/>
+{% endblock %}
+
+{% block content %}
+<section class="main-content">
+    
+    <!-- 2a) PAGE HEADER: Title + Record count + Buttons -->
+    <div class="page-header">
+        <h1 class="page-title">
+            Manage Item Categories
+            <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
+        </h1>
+        <div class="action-buttons">
+            {% include "components/button-plus.html" with text="Categories" type="button" data_open="categoryModal" class="ml-2" color="#358f80" dark_color="#036666"%}            
+        </div>
+    </div>
+    
+    <!-- 2b) FILTERS -->
+    <div class="filters">
+        Manage Filters
+    </div>
+    
+    <!-- 2c) TABLES -->
+    <div class="tables">
+        Manage Tables
+    </div>
+    
+</section>
+
+{% include "components/modal-form.html" with modal_id="categoryModal" form_id="categoryForm" title="New Category" action_url=request.path form=form %}
+
+
+{% endblock %}

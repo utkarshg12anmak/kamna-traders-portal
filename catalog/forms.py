@@ -62,3 +62,31 @@ class TaxRateForm(BootstrapFormMixin, forms.ModelForm):
             'name': forms.TextInput(attrs={'placeholder': 'GST Name'}),
             'rate': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'e.g. 18.00'}),
         }
+
+from django import forms
+from django.utils.text import slugify
+from .models import Category
+from .forms import BootstrapFormMixin  # your mixin that injects form-control
+
+class CategoryForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model  = Category
+        fields = ['name', 'parent']
+        widgets = {
+            'name':   forms.TextInput(attrs={'placeholder': 'Category name'}),
+            'parent': forms.Select(attrs={'placeholder': 'Optional parent'}),
+        }
+
+    def clean_parent(self):
+        parent = self.cleaned_data['parent']
+        # prevent deeper nesting than 2 levels
+        if parent and parent.parent is not None:
+            raise forms.ValidationError("You can only nest two levels.")
+        return parent
+
+    def clean_name(self):
+        name = self.cleaned_data['name'].strip()
+        # unique=True on model, but nicer message:
+        if Category.objects.filter(name__iexact=name).exists():
+            raise forms.ValidationError("A category with this name already exists.")
+        return name

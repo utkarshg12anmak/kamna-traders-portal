@@ -195,3 +195,49 @@ class TaxRateListView(LoginRequiredMixin, FormMixin, ListView):
         if is_ajax:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
+
+from django.urls import reverse_lazy
+from django.views.generic import ListView
+from django.views.generic.edit import FormMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from web_pages.models import PageItem
+from .models import Category
+from .forms  import CategoryForm
+
+class CategoryListView(LoginRequiredMixin, FormMixin, ListView):
+    model               = Category
+    template_name       = 'catalog/categories.html'
+    context_object_name = 'categories'
+
+    form_class  = CategoryForm
+    success_url = reverse_lazy('catalog:manage_categories')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if 'form' not in ctx:
+            ctx['form'] = self.get_form()
+        # sidebar/nav
+        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
+        ctx['current_item'] = catalog
+        ctx['nav_items']    = catalog.children.order_by('order','name')
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        form    = self.get_form()
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        if form.is_valid():
+            cat = form.save()
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'category': {
+                        'id':   cat.id,
+                        'name': cat.name,
+                        'parent': cat.parent.id if cat.parent else None,
+                    }
+                })
+            return super().form_valid(form)
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return super().form_invalid(form)
