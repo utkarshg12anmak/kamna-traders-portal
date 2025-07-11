@@ -73,7 +73,7 @@ class Brand(models.Model):
     """
     Manufacturer or brand of an item.
     """
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True)    
 
     class Meta:
         verbose_name = 'Brand'

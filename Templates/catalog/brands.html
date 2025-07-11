@@ -34,8 +34,34 @@ media="(prefers-color-scheme: dark)"
         <div class="action-buttons">                    
 
 
-{% include "components/button-plus.html" with text="Brands" type="button"  class="ml-2" color="#3aa856" dark_color="#34974d"%}
+{% include "components/button-plus.html" with text="Brands" type="button" data_toggle="modal" data_target="#brandModal" class="ml-2" color="#3aa856" dark_color="#34974d"%}
 
+  <div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="brandForm" method="post" action="{% url 'catalog:catalog-brands' %}">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="brandModalLabel">New Brand</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            <div class="invalid-feedback" id="name-error"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="brand-save-btn">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
 </div>
 </div>
@@ -52,10 +78,16 @@ media="(prefers-color-scheme: dark)"
 
 </section>
 
-<!-- UOM Modal (will be filled via AJAX) -->
-<div id="uomModal" class="modal-overlay" style="display:none;">
-  <!-- AJAX will inject .modal-content here -->
-</div>
+<script>
+  // Clear old errors when modal opens
+  document.getElementById('brandModal')
+    .addEventListener('show.bs.modal', () => {
+      document.getElementById('name-error').textContent = '';
+      document.querySelector('#brandForm input').classList.remove('is-invalid');
+    });
+
+  // (Later) Hook AJAX here – for now, native form submit works
+</script>
 
 
 

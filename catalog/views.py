@@ -103,24 +103,56 @@ def manage_uoms(request):
 
 # Add Manage Brands 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
-from .models import Brand
+from django.views.generic import ListView
+from django.views.generic.edit import FormMixin
+from django.urls import reverse_lazy
+from django.http import JsonResponse
 
-class BrandListView(LoginRequiredMixin, TemplateView):
+from .models import Brand
+from .forms import BrandForm
+from web_pages.models import PageItem
+
+class BrandListView(LoginRequiredMixin, FormMixin, ListView):
+    """
+    Shows the list of brands and handles new-brand POSTs via the same URL.
+    """
+    model = Brand
     template_name = "catalog/brands.html"
+    context_object_name = "brands"
+
+    form_class   = BrandForm
+    success_url  = reverse_lazy('catalog:catalog-brands')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        # Ensure the form is in context
+        if 'form' not in ctx:
+            ctx['form'] = self.get_form()
 
-        # look up your top-level “Catalog” page
-        catalog = PageItem.objects.get(
-            name__iexact="Catalog",
-            parent__isnull=True
-        )
-
-        # push it & its children into the template
+        # Sidebar/nav context (if you still need it)
+        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
         ctx["current_item"] = catalog
         ctx["nav_items"]    = catalog.children.all().order_by("order", "name")
         return ctx
 
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
+        if form.is_valid():
+            brand = form.save()
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'brand': {
+                        'id': brand.id,
+                        'name': brand.name,
+                        'created_at': brand.created_at.strftime('%Y-%m-%d %H:%M')
+                    }
+                })
+            return super().form_valid(form)
+
+        # form invalid
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return super().form_invalid(form)
