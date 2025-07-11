@@ -16,20 +16,6 @@ class BootstrapFormMixin:
             css = field.widget.attrs.get('class', '')
             field.widget.attrs['class'] = (css + ' form-control').strip()
 
-# A ModelForm for a single UoM
-class UnitOfMeasureForm(forms.ModelForm):
-    class Meta:
-        model = UnitOfMeasure
-        fields = ('name', 'abbreviation')
-
-# A formset to edit/create/delete multiple UoMs at once
-UnitOfMeasureFormSet = modelformset_factory(
-    UnitOfMeasure,
-    form=UnitOfMeasureForm,
-    extra=2,          # two blank forms to start
-    can_delete=True   # allow marking rows for deletion
-)
-
 # Create Brands
 from django import forms
 from django.core.exceptions import ValidationError

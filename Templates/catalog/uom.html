@@ -1,0 +1,51 @@
+{# templates/Catalog/uom.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Catalog Home{% endblock %}
+
+{% block extra_head %}
+{# page-specific favicons, scripts, etc. #}
+<link
+rel="icon"
+href="{% static 'favicon_dark.svg' %}"
+type="image/svg+xml"
+media="(prefers-color-scheme: light)"
+/>
+<link
+rel="icon"
+href="{% static 'favicon_light.svg' %}"
+type="image/svg+xml"
+media="(prefers-color-scheme: dark)"
+/>
+{% endblock %}
+
+{% block content %}
+<section class="main-content">
+    
+    <!-- 2a) PAGE HEADER: Title + Record count + Buttons -->
+    <div class="page-header">
+        <h1 class="page-title">
+            Manage UOMs
+            <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
+        </h1>
+        <div class="action-buttons">
+            {% include "components/button-plus.html" with text="UOMs" type="button" data_open="" class="ml-2" color="#ce4257" dark_color="#720026"%}            
+        </div>
+    </div>
+    
+    <!-- 2b) FILTERS -->
+    <div class="filters">
+        Manage Filters
+    </div>
+    
+    <!-- 2c) TABLES -->
+    <div class="tables">
+        Manage Tables
+    </div>
+    
+</section>
+
+{% include "components/modal-form.html" with modal_id="uomModal" form_id="uom-Form" title="New Unit of Measurement" action_url=request.path form=form %}
+
+{% endblock %}
