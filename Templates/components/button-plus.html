@@ -53,6 +53,7 @@
 </style>
 
 <button
+  {% if id %}id="{{ id }}"{% endif %}
   type="{{ type|default:'button' }}"
   class="button-plus {{ class|default:'' }}"
     {% if onclick %}
