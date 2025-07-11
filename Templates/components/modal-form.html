@@ -95,6 +95,33 @@
         gap: 0.75rem; /* Space between buttons */
     }
 
+.modal-body {
+  display: flex;
+  flex-direction: column; /* still stack groups vertically */
+  gap: 1rem;
+}
+
+/* turn each label+input group into a row */
+.modal-body .form-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* fix label width and remove its bottom margin */
+.modal-body .form-group label {
+  flex: 0 0 30%;     /* 30% of the row for the label */
+  margin-bottom: 0;  /* cancel the default bottom margin */
+  white-space: nowrap;
+}
+
+/* let the input fill the rest */
+.modal-body .form-group input,
+.modal-body .form-group select,
+.modal-body .form-group textarea {
+  flex: 1;
+  width: auto;       /* override any 100% you had before */
+}
 
 
 
@@ -115,13 +142,15 @@
         class="modal-form">
         {% csrf_token %}
         
+        <div class="modal-body">
         {% for field in form %}
-        <div class="form-group">
+            <div class="form-group">
             {{ field.label_tag }}
-            {{ field }}  {# the widget already has class="form-control" from your mixin #}
+            {{ field }}
             <div class="invalid-feedback" id="{{ field.name }}-error"></div>
-        </div>
+            </div>
         {% endfor %}
+        </div>
         
         <div class="modal-footer">                               
             {% include "components/button-close.html" with text="Cancel" data_close=modal_id %}
