@@ -22,6 +22,95 @@ media="(prefers-color-scheme: dark)"
 
 {% block content %}
 
+<style>
+/* static/css/catalog_modal.css */
+
+/* Overlay backdrop for modals */
+.modal-overlay {
+  display: none;          /* Hidden by default */
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal container */
+.modal {
+  background-color: #ffffff;
+  border-radius: 8px;
+  width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+.modal-header {
+  background-color: #ffffff;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.modal-header button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+/* Body */
+.modal-body {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+.modal-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+.modal-body th,
+.modal-body td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+.modal-body input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.25rem;
+}
+
+/* Footer */
+.modal-footer {
+  padding: 0.75rem 1rem;
+  text-align: right;
+  border-top: 1px solid #eee;
+  background-color: #f9f9f9;
+}
+.modal-footer .btn-small {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  margin-left: 0.5rem;
+}
+
+</style>
+
+
 
 <section class="main-content">
     
@@ -60,11 +149,17 @@ media="(prefers-color-scheme: dark)"
 
 </section>
 
-<!-- UOM Modal (will be filled via AJAX) -->
-<div id="uomModal" class="modal-overlay" style="display:none;">
-  <!-- AJAX will inject .modal-content here -->
-</div>
+{% include "catalog/uom_manage_popup.html" %}
 
+<script>
+  function openUomModal() {
+    const overlay = document.getElementById('uomModal');
+    overlay.style.display = 'flex';
+  }
+  function closeUomModal() {
+    document.getElementById('uomModal').style.display = 'none';
+  }
+</script>
 
 
 {% endblock %}
