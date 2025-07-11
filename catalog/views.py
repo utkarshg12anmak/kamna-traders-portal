@@ -88,7 +88,7 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
             {'key':'updated_by',   'title':'Updated By'},
         ]
 
-        ctx['freeze_left']  = 1
+        ctx['freeze_left']  = 0
         ctx['freeze_right'] = 0
 
         return ctx
