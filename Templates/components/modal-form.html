@@ -1,129 +1,158 @@
 {# components/modal-form.html #}
 
 <style> 
-    .modal-footer {
-        display: flex;
-        justify-content: space-between;
-    }
- 
-    /* Add a subtle animation for the modal */
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        opacity: 0; /* Start hidden for animation */
-        transition: opacity 0.3s ease-in-out;
-    }
+/* Base Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out; /* Slightly faster fade */
+}
 
-    .modal-overlay.active {
-        display: flex;
-        opacity: 1; /* Fade in */
-    }
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
 
-    .modal-box {
-        background: white;
-        padding: 2rem; /* Increased padding */
-        border-radius: .75rem; /* Slightly more rounded corners */
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2); /* Stronger, more diffused shadow */
-        max-width: 450px; /* Slightly wider modal */
-        width: 90%;
-        position: relative;
-        transform: translateY(-20px); /* Start slightly above center for animation */
-        transition: transform 0.3s ease-in-out;
-    }
+.modal-box {
+    background: #fff; /* Pure white background */
+    padding: 1.5rem 2rem; /* Adjusted padding for a cleaner look */
+    border-radius: 0.25rem; /* Sharper corners, typical for Zoho */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Softer, more refined shadow */
+    max-width: 500px; /* Slightly wider for better content distribution */
+    width: 90%;
+    position: relative;
+    transform: translateY(-10px); /* Subtle slide-in effect */
+    transition: transform 0.2s ease-out;
+    border: 1px solid #e0e0e0; /* Subtle border for definition */
+}
 
-    .modal-overlay.active .modal-box {
-        transform: translateY(0); /* Slide into place */
-    }
+.modal-overlay.active .modal-box {
+    transform: translateY(0);
+}
 
-    .modal-box .close-btn {
-        position: absolute;
-        top: 1rem; /* Adjusted position */
-        right: 1rem; /* Adjusted position */
-        font-size: 1.75rem; /* Larger close button */
-        cursor: pointer;
-        color: #888; /* Softer color */
-        transition: color 0.2s ease;
-    }
+/* Close Button */
+.modal-box .close-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1.5rem; /* Standard close button size */
+    cursor: pointer;
+    color: #888;
+    transition: color 0.15s ease;
+    padding: 0.25rem; /* Add some padding for easier clicking */
+    line-height: 1; /* Ensure proper alignment */
+}
 
-    .modal-box .close-btn:hover {
-        color: red; /* Darker on hover */
-    }
+.modal-box .close-btn:hover {
+    color: red; /* Darker on hover, not necessarily red */
+}
 
-    /* Modal header styles */
-    .modal-box h3 {
-        font-size: 1.8rem; /* Larger title */
-        margin-bottom: 1.5rem; /* More space below title */
-        color: #333; /* Darker text */
-        text-align: center; /* Centered title */
-        font-weight: 600; /* Slightly bolder */
-    }
+/* Modal Header */
+.modal-box h3 {
+    font-size: 1.4rem; /* More aligned with Zoho's headers */
+    margin-bottom: 1.25rem; /* Standard spacing */
+    color: #333;
+    text-align: left; /* Zoho often aligns titles left */
+    font-weight: 500; /* Medium weight */
+    padding-bottom: 1rem; /* Space below title */
+    border-bottom: 1px solid #eee; /* Subtle separator line */
+}
 
-    /* Form specific styles */
-    .modal-box form label {
-        display: block; /* Ensure label is on its own line */
-        margin-bottom: 0.5rem; /* Space below label */
-        font-weight: 500; /* Slightly bolder label */
-        color: #555;
-    }
-
-    .modal-box form input[type="text"] {
-        width: calc(100% - 20px); /* Account for padding */
-        padding: 0.75rem 1rem; /* More padding in input field */
-        margin-bottom: 1.5rem; /* Space below input field */
-        border: 1px solid #ccc; /* Subtle border */
-        border-radius: 0.375rem; /* Rounded input field */
-        font-size: 1rem;
-        box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    }
-
-    .modal-box form input[type="text"]:focus {
-        border-color: #007bff; /* Highlight on focus */
-        outline: none; /* Remove default outline */
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle glow on focus */
-    }
-
-    /* Button container */
-    .modal-box div[style="margin-top:1rem; text-align:right;"] {
-        margin-top: 2rem !important; /* More space above buttons */
-        display: flex; /* Use flexbox for button alignment */
-        justify-content: flex-end; /* Align buttons to the right */
-        gap: 0.75rem; /* Space between buttons */
-    }
-
+/* Modal Body & Form Layout */
 .modal-body {
-  display: flex;
-  flex-direction: column; /* still stack groups vertically */
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Consistent spacing between form groups */
+    padding-top: 1rem; /* Space between header and first form element */
 }
 
-/* turn each label+input group into a row */
 .modal-body .form-group {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+    display: flex;
+    align-items: center; /* Align label and input vertically */
+    gap: 0.75rem; /* Space between label and input */
 }
 
-/* fix label width and remove its bottom margin */
 .modal-body .form-group label {
-  flex: 0 0 30%;     /* 30% of the row for the label */
-  margin-bottom: 0;  /* cancel the default bottom margin */
-  white-space: nowrap;
+    flex: 0 0 120px; /* Fixed width for labels, provides clean alignment */
+    /* You might need to adjust this based on your longest label */
+    margin-bottom: 0;
+    font-weight: 400; /* Regular font weight for labels */
+    color: #555;
+    white-space: nowrap; /* Prevent labels from wrapping */
+    text-align: right; /* Align labels to the right of their fixed width */
+    padding-right: 0.5rem; /* Small padding between label and input */
 }
 
-/* let the input fill the rest */
-.modal-body .form-group input,
+.modal-body .form-group input[type="text"],
 .modal-body .form-group select,
 .modal-body .form-group textarea {
-  flex: 1;
-  width: auto;       /* override any 100% you had before */
+    flex: 1;
+    padding: 0.6rem 0.8rem; /* Slightly less padding for a compact look */
+    border: 1px solid #dcdcdc; /* Lighter border color */
+    border-radius: 0.2rem; /* Slightly less rounded corners */
+    font-size: 0.95rem; /* Slightly smaller font size */
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.modal-body .form-group input[type="text"]:focus,
+.modal-body .form-group select:focus,
+.modal-body .form-group textarea:focus {
+    outline: none;    
+    border: 2px solid #4A9DEC;
+    box-shadow: 0px 0px 0px 7px rgb(74, 157, 236, 20%);
+    background-color: white;
+}
 
+/* Modal Footer & Buttons */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    margin-top: 1.5rem; /* Space above buttons */
+    padding-top: 1rem; /* Padding above the footer content */
+    border-top: 1px solid #eee; /* Separator line above footer */
+    gap: 0.75rem; /* Space between buttons */
+}
+
+.modal-footer button {
+    padding: 0.6rem 1.2rem; /* Standard button padding */
+    border: 1px solid;
+    border-radius: 0.2rem; /* Consistent button corner radius */
+    cursor: pointer;
+    font-size: 0.9rem; /* Slightly smaller button text */
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Primary Button (e.g., Save/Submit) */
+.modal-footer .primary-btn { /* Add this class to your primary button */
+    background-color: #4CAF50; /* Zoho Green */
+    border-color: #4CAF50;
+    color: white;
+}
+
+.modal-footer .primary-btn:hover {
+    background-color: #45a049; /* Darker green on hover */
+    border-color: #45a049;
+}
+
+/* Secondary Button (e.g., Cancel) */
+.modal-footer .secondary-btn { /* Add this class to your secondary button */
+    background-color: #fff;
+    border-color: #ccc;
+    color: #555;
+}
+
+.modal-footer .secondary-btn:hover {
+    background-color: #f8f8f8;
+    border-color: #bbb;
+    color: #333;
+}
 
     
 </style>
