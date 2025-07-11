@@ -68,6 +68,8 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
     form_class   = BrandForm
     success_url  = reverse_lazy('catalog:catalog-brands')
 
+
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         # Ensure the form is in context
@@ -78,6 +80,15 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
         ctx["current_item"] = catalog
         ctx["nav_items"]    = catalog.children.all().order_by("order", "name")
+
+        ctx['table_columns'] = [
+        {'key':'id',         'title':'ID'},
+        {'key':'name',       'title':'Name'},
+        {'key':'created_at','title':'Created On'},
+        ]
+        ctx['freeze_left']  = 1
+        ctx['freeze_right'] = 1
+
         return ctx
 
     def post(self, request, *args, **kwargs):

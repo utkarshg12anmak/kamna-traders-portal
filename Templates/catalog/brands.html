@@ -47,7 +47,7 @@ media="(prefers-color-scheme: dark)"
 
 <!-- 2c) TABLES -->
 <div class="tables">
-    <p>Tables go here</p>
+  {% include "components/data-table.html" with columns=table_columns rows=brands freeze_left=freeze_left freeze_right=freeze_right %}
 </div>
 
 </section>
