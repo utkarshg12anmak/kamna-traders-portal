@@ -30,7 +30,7 @@ media="(prefers-color-scheme: dark)"
             <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
         </h1>
         <div class="action-buttons">
-            {% include "components/button-plus.html" with text="Tax Rates" type="button" data_open="" class="ml-2" color="#e85d04" dark_color="#dc2f02"%}            
+            {% include "components/button-plus.html" with text="Tax Rates" type="button" data_open="taxrateModal" class="ml-2" color="#e85d04" dark_color="#dc2f02"%}            
         </div>
     </div>
     
@@ -46,6 +46,6 @@ media="(prefers-color-scheme: dark)"
     
 </section>
 
-{% include "components/modal-form.html" with modal_id="" form_id="" title="New Tax Rates" action_url=request.path form=form %}
+{% include "components/modal-form.html" with modal_id="taxrateModal" form_id="taxrateForm" title="New Tax Rates" action_url=request.path form=form %}
 
 {% endblock %}

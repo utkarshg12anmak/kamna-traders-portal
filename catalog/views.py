@@ -165,7 +165,7 @@ class TaxRateListView(LoginRequiredMixin, FormMixin, ListView):
     context_object_name = "taxrates"
 
     form_class   = TaxRateForm
-    success_url  = reverse_lazy('catalog:manage_taxrates')
+    success_url  = reverse_lazy('catalog:catalog-tax-rates')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
