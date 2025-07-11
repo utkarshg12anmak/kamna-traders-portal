@@ -40,12 +40,10 @@ media="(prefers-color-scheme: dark)"
 
 {% include "components/button-plus.html" with text="Categories" type="button" class="ml-2" color="#d8572a" dark_color="#c32f27"%}         
 
-{% include "components/button-plus.html" with text="Tax Rates" type="button" class="ml-2" color="#8d99ae" dark_color="#2b2d42"%}         
+{% include "components/button-plus.html" with text="Tax Rates" type="button"  onclick="openTaxModal()" class="ml-2" color="#8d99ae" dark_color="#2b2d42"%}         
 
-{% include "components/button-plus.html" with text="UOM" type="button" class="ml-2" color="#ff4d6d" dark_color="#c9184a"%}         
+{% include "components/button-plus.html" with text="UOM" type="button" onclick="openUomModal()" class="ml-2" color="#ff4d6d" dark_color="#c9184a"%}         
 
-
-{% include "components/modal_dynamic.html" with id="brandModal" title="Add / Edit Brands" width="500px" height="60vh" save_text="Save Brands" action_url=brand_create_url %}
 
 </div>
 </div>
@@ -61,4 +59,12 @@ media="(prefers-color-scheme: dark)"
 </div>
 
 </section>
+
+<!-- UOM Modal (will be filled via AJAX) -->
+<div id="uomModal" class="modal-overlay" style="display:none;">
+  <!-- AJAX will inject .modal-content here -->
+</div>
+
+
+
 {% endblock %}

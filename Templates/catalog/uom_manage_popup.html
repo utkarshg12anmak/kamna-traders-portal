@@ -1,0 +1,139 @@
+{# catalog/templates/catalog/uom_manage_popup.html #}
+
+<style>
+  /* Overlay */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  /* Modal box */
+  .modal {
+    background: #fff;
+    border-radius: 8px;
+    width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+</style>
+
+
+<div class="modal">
+  <div class="modal-header">
+    <h2>Manage Units of Measure</h2>
+    <button type="button" onclick="closeUomModal()">×</button>
+  </div>
+
+  <div class="modal-body">
+    <form id="uom-formset" method="post">
+      {% csrf_token %}
+      {{ formset.management_form }}
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Abbreviation</th>
+            <th>Delete?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in formset %}
+            <tr>
+              <td>{{ form.name }}</td>
+              <td>{{ form.abbreviation }}</td>
+              <td>{{ form.DELETE }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary btn-small" onclick="closeUomModal()">Cancel</button>
+    <button type="submit" form="uom-formset" class="btn btn-primary btn-small">Save</button>
+  </div>
+</div>
+
+<script>
+// Reuse your getCSRFToken helper (or add it if missing)
+function getCSRFToken() {
+  const cookieMeta = document.querySelector('meta[name="csrf-token"]');
+  if (cookieMeta) return cookieMeta.content;
+  // fallback: parse document.cookie
+  const name = 'csrftoken=';
+  const decoded = decodeURIComponent(document.cookie);
+  for (let part of decoded.split('; ')) {
+    if (part.startsWith(name)) return part.substring(name.length);
+  }
+  return '';
+}
+
+// Open the UoM modal and load the formset HTML
+function openUomModal() {
+  const overlay = document.getElementById('uomModal');
+  fetch("{% url 'catalog:manage_uoms' %}")
+    .then(res => res.text())
+    .then(html => {
+      overlay.innerHTML = html;
+      overlay.style.display = 'flex';
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Failed to load Units of Measure.');
+    });
+}
+
+// Close the UoM modal (call this from a close button inside the injected HTML)
+function closeUomModal() {
+  document.getElementById('uomModal').style.display = 'none';
+}
+
+// Handle form submission from the injected popup
+document.addEventListener('submit', function(e) {
+  if (e.target.id === 'uom-formset') {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    fetch("{% url 'catalog:manage_uoms' %}", {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCSRFToken() },
+      credentials: 'same-origin',
+      body: data
+    })
+    .then(res => {
+      // We expect JSON on success, HTML on validation errors
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        return res.json().then(json => ({ json }));
+      } else {
+        return res.text().then(html => ({ html }));
+      }
+    })
+    .then(({ json, html }) => {
+      if (json && json.status === 'ok') {
+        // refresh the page so the UoM dropdown shows new entries
+        window.location.reload();
+      } else if (html) {
+        // re-inject the formset with error messages
+        const overlay = document.getElementById('uomModal');
+        overlay.innerHTML = html;
+        overlay.style.display = 'flex';
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error saving Units of Measure.');
+    });
+  }
+});
+</script>
