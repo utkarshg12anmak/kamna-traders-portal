@@ -1,4 +1,4 @@
-{# templates/Catalog/uom.html #}
+{# templates/Catalog/tax-rates.html #}
 {% extends "base.html" %}
 {% load static %}
 
@@ -26,11 +26,11 @@ media="(prefers-color-scheme: dark)"
     <!-- 2a) PAGE HEADER: Title + Record count + Buttons -->
     <div class="page-header">
         <h1 class="page-title">
-            Manage UOMs
+            Manage Tax Rates
             <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
         </h1>
         <div class="action-buttons">
-            {% include "components/button-plus.html" with text="UOMs" type="button" data_open="uomModal" class="ml-2" color="#ce4257" dark_color="#720026"%}            
+            {% include "components/button-plus.html" with text="Tax Rates" type="button" data_open="" class="ml-2" color="#e85d04" dark_color="#dc2f02"%}            
         </div>
     </div>
     
@@ -46,6 +46,6 @@ media="(prefers-color-scheme: dark)"
     
 </section>
 
-{% include "components/modal-form.html" with modal_id="uomModal" form_id="uomForm" title="New Unit of Measurement" action_url=request.path form=form %}
+{% include "components/modal-form.html" with modal_id="" form_id="" title="New Tax Rates" action_url=request.path form=form %}
 
 {% endblock %}

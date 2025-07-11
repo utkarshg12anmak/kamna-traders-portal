@@ -102,26 +102,96 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
     
+from django.urls import reverse_lazy
+from django.views.generic import ListView
+from django.views.generic.edit import FormMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from .models import UnitOfMeasure
+from .forms import UnitOfMeasureForm
+from web_pages.models import PageItem
 
-class UOMListView(LoginRequiredMixin, FormMixin, ListView):
-    """
-    Shows the list of brands and handles new-brand POSTs via the same URL.
-    """
-    model = UnitOfMeasure
-    template_name = "catalog/uom.html"
-    context_object_name = "uom"
+class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
+    model               = UnitOfMeasure
+    template_name       = "catalog/uom.html"
+    context_object_name = "uoms"
 
-    form_class   = BrandForm
+    form_class   = UnitOfMeasureForm
     success_url  = reverse_lazy('catalog:catalog-uom')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        # Ensure the form is in context
+        # bring in the empty (or bound) form
         if 'form' not in ctx:
             ctx['form'] = self.get_form()
-
-        # Sidebar/nav context (if you still need it)
+        # sidebar/nav context if you need it
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
         ctx["current_item"] = catalog
-        ctx["nav_items"]    = catalog.children.all().order_by("order", "name")
+        ctx["nav_items"]    = catalog.children.order_by("order", "name")
         return ctx
+
+    def post(self, request, *args, **kwargs):
+        form    = self.get_form()
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        if form.is_valid():
+            uom = form.save()
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'uom': {
+                        'id':   uom.id,
+                        'name': uom.name,
+                        'abbr': uom.abbreviation,
+                    }
+                })
+            return super().form_valid(form)
+        # invalid
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return super().form_invalid(form)
+
+from django.urls import reverse_lazy
+from django.views.generic import ListView
+from django.views.generic.edit import FormMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from .models import TaxRate
+from .forms  import TaxRateForm
+from web_pages.models import PageItem
+
+class TaxRateListView(LoginRequiredMixin, FormMixin, ListView):
+    model               = TaxRate
+    template_name       = "catalog/taxrates.html"
+    context_object_name = "taxrates"
+
+    form_class   = TaxRateForm
+    success_url  = reverse_lazy('catalog:manage_taxrates')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if 'form' not in ctx:
+            ctx['form'] = self.get_form()
+        # sidebar/nav if you use it
+        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
+        ctx["current_item"] = catalog
+        ctx["nav_items"]    = catalog.children.order_by("order","name")
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        form    = self.get_form()
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        if form.is_valid():
+            tr = form.save()
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'taxrate': {
+                        'id':   tr.id,
+                        'name': tr.name,
+                        'rate': str(tr.rate),
+                    }
+                })
+            return super().form_valid(form)
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return super().form_invalid(form)

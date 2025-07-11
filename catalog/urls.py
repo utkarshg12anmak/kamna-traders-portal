@@ -5,8 +5,10 @@ from . import views
 from django.views.generic import RedirectView
 from .views import CatalogHomeView
 from .views import BrandListView
-from .views import UOMListView
+from .views import UnitOfMeasureListView
 from .views import ItemListView
+from .views import TaxRateListView
+
 
 
 app_name = 'catalog'
@@ -24,7 +26,9 @@ urlpatterns = [
     path('items/', ItemListView.as_view(), name='catalog-items'),
     path('brands/', BrandListView.as_view(), name='catalog-brands'),
     path('bom/', ItemListView.as_view(), name='catalog-bom'),     
-    path('uom/', UOMListView.as_view(), name='catalog-uom'),         
+    path('uom/', UnitOfMeasureListView.as_view(), name='catalog-uom'),         
+    path('tax-rates/', TaxRateListView.as_view(), name='catalog-tax-rates'), 
+    path('item-categories/', UnitOfMeasureListView.as_view(), name='catalog-item-categories'), 
 
 ]
 

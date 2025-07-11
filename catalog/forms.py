@@ -39,3 +39,26 @@ class BrandForm(forms.ModelForm,BootstrapFormMixin):
             raise ValidationError("A brand with this name already exists.")
         return name
 
+from .models import UnitOfMeasure
+
+class UnitOfMeasureForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model  = UnitOfMeasure
+        fields = ['name', 'abbreviation']
+        widgets = {
+            'name':         forms.TextInput(attrs={'placeholder':'UoM name'}),
+            'abbreviation': forms.TextInput(attrs={'placeholder':'e.g. kg, pcs'}),
+        }
+
+from django import forms
+from .models import TaxRate
+from .forms import BootstrapFormMixin  # your mixin from before
+
+class TaxRateForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model  = TaxRate
+        fields = ['name', 'rate']
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'GST Name'}),
+            'rate': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'e.g. 18.00'}),
+        }
