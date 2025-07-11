@@ -4,6 +4,18 @@ from django import forms
 from django.forms import modelformset_factory
 from .models import UnitOfMeasure
 
+from django import forms
+
+class BootstrapFormMixin:
+    """
+    Mixin to add 'form-control' to every field widget.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            css = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = (css + ' form-control').strip()
+
 # A ModelForm for a single UoM
 class UnitOfMeasureForm(forms.ModelForm):
     class Meta:
@@ -23,7 +35,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Brand
 
-class BrandForm(forms.ModelForm):
+class BrandForm(forms.ModelForm,BootstrapFormMixin):
     class Meta:
         model = Brand
         fields = ['name']
