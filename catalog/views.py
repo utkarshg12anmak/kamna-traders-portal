@@ -68,8 +68,6 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
     form_class   = BrandForm
     success_url  = reverse_lazy('catalog:catalog-brands')
 
-
-
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         # Ensure the form is in context
@@ -82,36 +80,35 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
         ctx["nav_items"]    = catalog.children.all().order_by("order", "name")
 
         ctx['table_columns'] = [
-        {'key':'id',         'title':'ID'},
-        {'key':'name',       'title':'Name'},
-        {'key':'created_at','title':'Created On'},
+            {'key':'id',           'title':'ID'},
+            {'key':'name',         'title':'Name'},
+            {'key':'created_at',   'title':'Created At'},
+            {'key':'created_by',   'title':'Created By'},
+            {'key':'updated_at',   'title':'Updated At'},
+            {'key':'updated_by',   'title':'Updated By'},
         ]
+
         ctx['freeze_left']  = 1
-        ctx['freeze_right'] = 1
+        ctx['freeze_right'] = 0
 
         return ctx
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
+    def post(self, request, *args, **kwargs):        
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-
+        form = self.get_form()
         if form.is_valid():
-            brand = form.save()
-            if is_ajax:
+            brand = form.save(user=request.user)   # <— pass user here
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True,
                     'brand': {
-                        'id': brand.id,
+                        'id':   brand.id,
                         'name': brand.name,
-                        'created_at': brand.created_at.strftime('%Y-%m-%d %H:%M')
+                        'created_at': brand.created_at.strftime('%Y-%m-%d %H:%M'),
+                        'created_by': brand.created_by.get_full_name() or brand.created_by.username,
                     }
                 })
             return super().form_valid(form)
-
-        # form invalid
-        if is_ajax:
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
-        return super().form_invalid(form)
     
 from django.urls import reverse_lazy
 from django.views.generic import ListView

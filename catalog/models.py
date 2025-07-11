@@ -4,6 +4,27 @@ from django.conf import settings
 from django.utils.text import slugify
 import random, string
 
+from django.db import models
+from django.conf import settings
+
+class TimeStampedUserModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        related_name="%(class)ss_created",
+        on_delete=models.PROTECT,
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        related_name="%(class)ss_updated",
+        on_delete=models.PROTECT,
+    )
+
+    class Meta:
+        abstract = True
 
 def item_image_upload_to(instance, filename):
     """
@@ -69,7 +90,7 @@ class TaxRate(models.Model):
         return f"{self.name} ({self.rate}%)"
 
 
-class Brand(models.Model):
+class Brand(TimeStampedUserModel):
     """
     Manufacturer or brand of an item.
     """

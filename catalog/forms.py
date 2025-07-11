@@ -6,6 +6,17 @@ from .models import UnitOfMeasure
 
 from django import forms
 
+class AuditFormMixin:
+    def save(self, user=None, commit=True):
+        inst = super().save(commit=False)
+        if user and hasattr(inst, 'updated_by'):
+            inst.updated_by = user
+        if not inst.pk and user and hasattr(inst, 'created_by'):
+            inst.created_by = user
+        if commit:
+            inst.save()
+        return inst
+
 class BootstrapFormMixin:
     """
     Mixin to add 'form-control' to every field widget.
@@ -21,7 +32,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Brand
 
-class BrandForm(forms.ModelForm,BootstrapFormMixin):
+class BrandForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Brand
         fields = ['name']
