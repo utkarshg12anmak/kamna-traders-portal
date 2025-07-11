@@ -1,7 +1,11 @@
 {# components/modal-form.html #}
 <div id="{{ modal_id }}" class="modal-overlay">
   <div class="modal-box">
-    <span class="close-btn" data-close="{{ modal_id }}">&times;</span>
+
+
+   <span class="close-btn" data-close="{{ modal_id }}">&times;</span> 
+
+
     <h3>{{ title }}</h3>
     <form id="{{ form_id }}"
           method="post"
@@ -18,8 +22,8 @@
       {% endfor %}
 
       <div class="modal-footer">
-        <button type="button" data-close="{{ modal_id }}" class="btn-secondary">Cancel</button>
-        <button type="submit" class="btn-primary">Save</button>
+        <button type="button" data-close="{{ modal_id }}" class="btn-secondary">Cancel</button>        
+        {% include "components/button-save.html" with text="Save" type="submit" %}
       </div>
     </form>
   </div>
