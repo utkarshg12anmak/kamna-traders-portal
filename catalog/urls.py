@@ -1,22 +1,22 @@
 # catalog/urls.py
 
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.views.generic import RedirectView
 from .views import CatalogHomeView
 from .views import CatalogItemView
+from .views import ItemListView
 from rest_framework.routers import DefaultRouter
-from .views import CategoryViewSet, UnitOfMeasureViewSet, TaxRateViewSet, BrandViewSet, ItemViewSet
+from .views import TaxRateViewSet
+from .views import manage_uoms
+
 
 app_name = 'catalog'
 
 
 router = DefaultRouter()
-router.register('categories', CategoryViewSet)
-router.register('uoms', UnitOfMeasureViewSet)
-router.register('taxrates', TaxRateViewSet)
-router.register('brands', BrandViewSet)
-router.register('items', ItemViewSet)
+router.register(r"taxrates", TaxRateViewSet)
+
 
 urlpatterns = [
     # Redirect “/catalog/” → “/catalog/home/”
@@ -30,6 +30,9 @@ urlpatterns = [
     path('home/', CatalogHomeView.as_view(), name='catalog-home'),
     path('items/', CatalogItemView.as_view(), name='catalog-items'),
     path('bom/', CatalogHomeView.as_view(), name='catalog-bom'),
-    path('brands/bulk-create/', views.bulk_create_brands, name='brand-bulk-create'),
+    path("catalog/items/", ItemListView.as_view(), name="catalog-items"),
+    path("api/", include(router.urls)),
+    path('manage-uoms/', manage_uoms, name='manage_uoms'),
 
 ]
+
