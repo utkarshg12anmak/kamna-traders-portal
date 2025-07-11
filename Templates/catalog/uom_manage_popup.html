@@ -1,33 +1,217 @@
 {# templates/catalog/uom_manage_popup.html #}
-<div id="uomModal" class="modal-overlay" style="display: none;">
-  <div class="modal">
+<div id="uomModal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="uomModalTitle">
+  <div class="modal uom-modal-card">
+    <button type="button" class="modal-close-btn" aria-label="Close" onclick="closeUomModal()">&times;</button>
     <div class="modal-header">
-      <h2>Manage Units of Measure</h2>
-      <button type="button" onclick="closeUomModal()">×</button>
+      <h2 id="uomModalTitle">Manage Units of Measure</h2>
+      <div class="modal-subtitle">Add, edit, or remove units for your catalog items.</div>
     </div>
     <div class="modal-body">
-      <form id="uom-formset" method="post" action="{% url 'catalog:manage_uoms' %}">
+      <form id="uom-formset" method="post" action="{% url 'catalog:manage_uoms' %}" autocomplete="off">
         {% csrf_token %}
         {{ formset.management_form }}
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Abbreviation</th><th>Delete?</th></tr>
-          </thead>
-          <tbody>
-            {% for form in formset %}
-              <tr>
-                <td>{{ form.name }}</td>
-                <td>{{ form.abbreviation }}</td>
-                <td>{{ form.DELETE }}</td>
+        <div id="uom-form-errors">
+          {% if formset.non_form_errors %}
+            <div class="form-errors error-message">
+              {{ formset.non_form_errors }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="uom-table-wrapper">
+          <table id="uom-table" class="uom-table">
+            <thead>
+              <tr><th>Name</th><th>Abbreviation</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="uom-table-body">
+              {% for form in formset %}
+                <tr class="uom-form-row">
+                  <td>{% if form.name.errors %}<div class="field-error error-message">{{ form.name.errors|join:', ' }}</div>{% endif %}{{ form.name }}</td>
+                  <td>{% if form.abbreviation.errors %}<div class="field-error error-message">{{ form.abbreviation.errors|join:', ' }}</div>{% endif %}{{ form.abbreviation }}</td>
+                  <td>
+                    <button type="button" class="uom-delete-btn" title="Delete UOM" tabindex="0" onclick="this.closest('tr').querySelector('input[type=checkbox][name$=DELETE]').checked = true; this.closest('form').requestSubmit();">
+                      <span aria-hidden="true">🗑️</span>
+                      <span class="sr-only">Delete</span>
+                    </button>
+                    {{ form.DELETE }}
+                  </td>
+                </tr>
+              {% endfor %}
+              <!-- Hidden template row for JS cloning -->
+              <tr class="uom-form-row uom-template-row" style="display:none;">
+                <td><input type="text" name="form-__prefix__-name" id="id_form-__prefix__-name" /></td>
+                <td><input type="text" name="form-__prefix__-abbreviation" id="id_form-__prefix__-abbreviation" /></td>
+                <td>
+                  <button type="button" class="uom-delete-btn" title="Delete UOM" tabindex="0">
+                    <span aria-hidden="true">🗑️</span>
+                    <span class="sr-only">Delete</span>
+                  </button>
+                  <input type="checkbox" name="form-__prefix__-DELETE" id="id_form-__prefix__-DELETE" style="display:none;" />
+                </td>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
+        <button type="button" id="add-uom-row" class="btn btn-primary uom-add-btn" style="margin-bottom: 1rem;">+ Add UOM</button>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-small" onclick="closeUomModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-small">Save</button>
+          <button type="submit" class="btn btn-primary btn-small uom-save-btn">Save</button>
         </div>
+        <div id="uom-ajax-message" class="uom-toast" style="margin-top: 1rem;"></div>
+        <div id="uom-loading-spinner" class="uom-loading-spinner" style="display:none;"></div>
       </form>
     </div>
   </div>
 </div>
+
+<style>
+.uom-modal-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  max-width: 540px;
+  margin: 2rem auto;
+  position: relative;
+  padding-bottom: 0;
+  width: 95vw;
+  min-width: 320px;
+  animation: fadeIn 0.2s;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: none; } }
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.2s;
+}
+.modal-close-btn:hover { color: #c9184a; }
+.modal-header {
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+  border-bottom: none;
+  background: transparent;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+}
+.modal-subtitle {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 0.25rem;
+}
+.modal-body {
+  padding: 1.5rem;
+  background: #f8f9fa;
+}
+.uom-table-wrapper {
+  overflow-x: auto;
+}
+.uom-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.uom-table th, .uom-table td {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.uom-table th {
+  background: #f1f3f6;
+  color: #444;
+  font-weight: 600;
+}
+.uom-table tr:nth-child(even) { background: #fafbfc; }
+.uom-table tr:hover { background: #f6f6f6; }
+.uom-add-btn {
+  background: #ff4d6d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.uom-add-btn:hover { background: #c9184a; }
+.uom-delete-btn {
+  background: none;
+  border: none;
+  color: #c9184a;
+  font-size: 1.25rem;
+  cursor: pointer;
+  margin-left: 0.25rem;
+  transition: color 0.2s;
+}
+.uom-delete-btn:hover { color: #ff4d6d; }
+.uom-save-btn {
+  background: #3aa856;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.uom-save-btn:hover { background: #34974d; }
+.btn-secondary {
+  background: #eee;
+  color: #444;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  transition: background 0.2s;
+}
+.btn-secondary:hover { background: #ddd; }
+.error-message {
+  color: #c9184a;
+  font-size: 0.95em;
+  margin-bottom: 0.25rem;
+}
+.uom-toast {
+  min-height: 1.5em;
+  color: #3aa856;
+  font-weight: 500;
+  text-align: center;
+}
+.uom-loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 2em;
+}
+.uom-loading-spinner:after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 32px;
+  border: 4px solid #eee;
+  border-top: 4px solid #3aa856;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@media (max-width: 600px) {
+  .uom-modal-card { max-width: 98vw; min-width: 0; padding: 0.5rem; }
+  .modal-header, .modal-body { padding: 1rem; }
+  .uom-table th, .uom-table td { padding: 0.5rem 0.25rem; }
+}
+.sr-only { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+</style>

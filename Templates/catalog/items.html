@@ -152,13 +152,126 @@ media="(prefers-color-scheme: dark)"
 {% include "catalog/uom_manage_popup.html" %}
 
 <script>
-  function openUomModal() {
-    const overlay = document.getElementById('uomModal');
-    overlay.style.display = 'flex';
+// --- UOM Modal AJAX Logic ---
+function openUomModal() {
+  const overlay = document.getElementById('uomModal');
+  // Show loading indicator
+  overlay.style.display = 'flex';
+  overlay.querySelector('.modal-body').innerHTML = '<div style="padding:2rem;text-align:center;">Loading...</div>';
+  // Fetch latest modal content via AJAX
+  fetch('{% url 'catalog:manage_uoms' %}')
+    .then(response => response.text())
+    .then(html => {
+      // Extract only the form part from the returned HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const form = doc.querySelector('#uom-formset');
+      overlay.querySelector('.modal-body').innerHTML = '';
+      if (form) {
+        overlay.querySelector('.modal-body').appendChild(form);
+        // Add a hidden template row for new UOMs
+        const tbody = form.querySelector('#uom-table-body');
+        if (tbody) {
+          const templateRow = tbody.querySelector('tr:last-child').cloneNode(true);
+          templateRow.style.display = 'none';
+          templateRow.classList.add('uom-template-row');
+          tbody.appendChild(templateRow);
+        }
+        attachUomModalHandlers();
+      } else {
+        overlay.querySelector('.modal-body').innerHTML = '<div style="color:red;">Failed to load form.</div>';
+      }
+    })
+    .catch(() => {
+      overlay.querySelector('.modal-body').innerHTML = '<div style="color:red;">Error loading form.</div>';
+    });
+  // Add click-outside-to-close
+  overlay.onclick = function(e) {
+    if (e.target === overlay) closeUomModal();
+  };
+}
+function closeUomModal() {
+  const overlay = document.getElementById('uomModal');
+  overlay.style.display = 'none';
+  overlay.onclick = null; // Remove handler to avoid leaks
+}
+
+// Attach handlers for add row and AJAX submit
+function attachUomModalHandlers() {
+  const form = document.getElementById('uom-formset');
+  if (!form) return;
+  // Add UOM row
+  const addBtn = document.getElementById('add-uom-row');
+  if (addBtn) {
+    addBtn.onclick = function() {
+      const tbody = document.getElementById('uom-table-body');
+      const totalForms = form.querySelector('input[name$="-TOTAL_FORMS"]');
+      const formIdx = parseInt(totalForms.value);
+      // Use the hidden template row
+      const templateRow = tbody.querySelector('.uom-template-row');
+      if (!templateRow) return;
+      const newRow = templateRow.cloneNode(true);
+      newRow.style.display = '';
+      newRow.classList.remove('uom-template-row');
+      // Update all input names/ids in the new row
+      newRow.querySelectorAll('input').forEach(input => {
+        // Remove error classes
+        input.classList.remove('error');
+        if (input.type === 'checkbox') {
+          input.checked = false;
+        } else {
+          input.value = '';
+        }
+        // Update name/index
+        input.name = input.name.replace(/-(\d+)-/, `-${formIdx}-`);
+        input.id = input.id.replace(/-(\d+)-/, `-${formIdx}-`);
+      });
+      // Remove error divs
+      newRow.querySelectorAll('.field-error').forEach(e => e.remove());
+      tbody.insertBefore(newRow, templateRow); // Always before the template
+      totalForms.value = formIdx + 1;
+    };
   }
-  function closeUomModal() {
-    document.getElementById('uomModal').style.display = 'none';
-  }
+  // AJAX form submit
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    })
+    .then(resp => {
+      // Try to parse as JSON, fallback to HTML
+      return resp.json().catch(() => resp.text());
+    })
+    .then(data => {
+      if (typeof data === 'object' && data.status === 'ok') {
+        closeUomModal();
+        // Optionally show a toast or reload UOMs elsewhere
+      } else {
+        // If errors, replace modal body with returned HTML (form with errors)
+        const overlay = document.getElementById('uomModal');
+        if (typeof data === 'string') {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, 'text/html');
+          const form = doc.querySelector('#uom-formset');
+          if (form) {
+            overlay.querySelector('.modal-body').innerHTML = '';
+            overlay.querySelector('.modal-body').appendChild(form);
+            attachUomModalHandlers();
+          } else {
+            overlay.querySelector('.modal-body').innerHTML = '<div style="color:red;">Error saving UOMs.</div>';
+          }
+        }
+      }
+    })
+    .catch(() => {
+      const msg = document.getElementById('uom-ajax-message');
+      if (msg) msg.innerHTML = '<span style="color:red;">Error saving UOMs.</span>';
+    });
+  };
+}
 </script>
 
 

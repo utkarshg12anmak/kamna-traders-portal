@@ -8,6 +8,8 @@ from .models import Item, TaxRate
 from django.views.generic import TemplateView
 from web_pages.models import PageItem
 from .models import UnitOfMeasure
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 
 class CatalogHomeView(TemplateView):
@@ -93,19 +95,31 @@ def manage_uoms(request):
     """
     Renders and processes a popup formset for creating/editing/deleting UoMs.
     """
-    # Query all existing UoMs
     qs = UnitOfMeasure.objects.all()
-    # Bind POST or initialize empty formset
     formset = UnitOfMeasureFormSet(request.POST or None, queryset=qs)
+
+    # Debug logging
+    if request.method == 'POST':
+        print("POST DATA:", dict(request.POST))
+        print("FORMSET ERRORS:", formset.errors)
+        print("NON_FORM ERRORS:", formset.non_form_errors())
+
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     if request.method == 'POST':
         if formset.is_valid():
             formset.save()
-            # Return JSON so the frontend knows to close the modal and refresh
-            return JsonResponse({'status': 'ok'})
-        # If invalid, fall through and re-render with errors
+            if is_ajax:
+                return JsonResponse({'status': 'ok'})
+            else:
+                return redirect('catalog:manage_uoms')
+        # If invalid
+        if is_ajax:
+            html = render_to_string('catalog/uom_manage_popup.html', {'formset': formset}, request=request)
+            return HttpResponse(html)
 
-    # On GET or invalid POST, render the popup HTML
-    return render(request, 'catalog/uom_manage_popup.html', {
-        'formset': formset
-    })
+    # On GET
+    if is_ajax:
+        html = render_to_string('catalog/uom_manage_popup.html', {'formset': formset}, request=request)
+        return HttpResponse(html)
+    return render(request, 'catalog/uom_manage_popup.html', {'formset': formset})
