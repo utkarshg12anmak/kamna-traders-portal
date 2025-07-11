@@ -2,7 +2,7 @@
 
 <style>
     /* From Uiverse.io by Madflows */ 
-    .button-save {
+    .button-close {
         position: relative;
         overflow: hidden;
         height: 2.5rem;
@@ -16,7 +16,7 @@
         cursor: pointer;
         }
 
-    .button-save:hover::before {
+    .button-close:hover::before {
     transform: scaleX(1);
     }
 
@@ -26,7 +26,7 @@
     font-size: 1rem;
     }
 
-    .button-save::before {
+    .button-close::before {
     content: "";
     position: absolute;
     top: 0;
@@ -37,9 +37,9 @@
     height: inherit;
     border-radius: inherit;
     background: linear-gradient(
-        75deg,
-        #55a630 25%,
-        #2b9348 94.3%
+        300deg,
+        #e5383b 25%,
+        #ba181b 94.3%
     );
     transition: all 0.475s;
     }
@@ -50,11 +50,12 @@
 <button
   {% if id %}id="{{ id }}"{% endif %}
   type="{{ type|default:'button' }}"
-  class="button-save {{ class|default:'' }}"
+  class="button-close {{ class|default:'' }}"
     {% if onclick %}
     onclick="{{ onclick }}"
   {% endif %}
   {% if data_open %}data-open="{{ data_open }}"{% endif %}
+  {% if data_close %}data-close="{{ data_close }}"{% endif %}
 >
   <span class="button-content">{{ text }}</span>
 </button>

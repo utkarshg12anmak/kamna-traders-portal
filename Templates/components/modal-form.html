@@ -1,30 +1,40 @@
 {# components/modal-form.html #}
+
+<style> 
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+</style>
+
 <div id="{{ modal_id }}" class="modal-overlay">
-  <div class="modal-box">
-
-
-   <span class="close-btn" data-close="{{ modal_id }}">&times;</span> 
-
-
-    <h3>{{ title }}</h3>
-    <form id="{{ form_id }}"
-          method="post"
-          action="{{ action_url }}"
-          class="modal-form">
-      {% csrf_token %}
-
-      {% for field in form %}
+    <div class="modal-box">
+        
+        
+        <span class="close-btn" data-close="{{ modal_id }}">&times;</span> 
+        
+        
+        <h3>{{ title }}</h3>
+        <form id="{{ form_id }}"
+        method="post"
+        action="{{ action_url }}"
+        class="modal-form">
+        {% csrf_token %}
+        
+        {% for field in form %}
         <div class="form-group">
-          {{ field.label_tag }}
-          {{ field }}  {# the widget already has class="form-control" from your mixin #}
-          <div class="invalid-feedback" id="{{ field.name }}-error"></div>
+            {{ field.label_tag }}
+            {{ field }}  {# the widget already has class="form-control" from your mixin #}
+            <div class="invalid-feedback" id="{{ field.name }}-error"></div>
         </div>
-      {% endfor %}
+        {% endfor %}
+        
+        <div class="modal-footer">                               
+            {% include "components/button-close.html" with text="Cancel" data_close=modal_id %}
 
-      <div class="modal-footer">
-        <button type="button" data-close="{{ modal_id }}" class="btn-secondary">Cancel</button>        
-        {% include "components/button-save.html" with text="Save" type="submit" %}
-      </div>
+            {% include "components/button-save.html" with text="Save" type="submit" %}
+        </div>
     </form>
-  </div>
+</div>
 </div>
