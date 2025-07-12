@@ -69,14 +69,13 @@ media="(prefers-color-scheme: dark)"
                     <tbody>
                         {% for brand in brands %}
                         <tr>
- <td style="text-align:center;">
-  {{ forloop.counter }}
-</td>
-                     
+                        <td style="text-align:center;">
+                        {{ forloop.counter }}
+                        </td>                     
                             <td>{% include "components/status_pill.html" with label=brand.name %}</td>  
-                            <td>{{ brand.created_at|date:"Y-m-d H:i" }}</td> 
+                            <td>{{ brand.created_at|date:"d-M-y h:i A" }}</td> 
                             <td>{% include "components/profile_pill.html" with name=brand.created_by.get_full_name %}</td>
-                            <td>{{ brand.updated_at|date:"Y-m-d H:i" }}</td> 
+                            <td>{{ brand.updated_at|date:"d-M-y h:i A" }}</td> 
                             <td>{% include "components/profile_pill.html" with name=brand.updated_by.get_full_name %}</td>
                             <td></td>                                                                                                                                                                                      
                     </tr>

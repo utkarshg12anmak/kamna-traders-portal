@@ -82,7 +82,10 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
             for brand in ctx['brands']
         }
 
-        return ctx
+        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
+        ctx["current_item"] = catalog
+        ctx["nav_items"]    = catalog.children.order_by("order", "name")
+        return ctx        
 
 
     def post(self, request, *args, **kwargs):
