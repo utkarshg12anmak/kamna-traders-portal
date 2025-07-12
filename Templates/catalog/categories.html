@@ -52,8 +52,7 @@ media="(prefers-color-scheme: dark)"
             <tr>
               <th style="width:3rem; text-align:center;">#</th>
               <th>Name</th>
-              <th>Parent</th>
-              <th>Slug</th>
+              <th>Parent</th>              
               <th>Created At</th>
               <th>Created By</th>
               <th>Updated At</th>
@@ -64,22 +63,15 @@ media="(prefers-color-scheme: dark)"
           <tbody>
             {% for cat in categories %}
             <tr>
-              <td style="text-align:center;">{{ forloop.counter }}</td>
-              <td>
-                {% if cat.parent %}
-                    {{ cat.parent.name }}
-                {% else %}
-                    &mdash;
-                {% endif %}
-              </td>              
-              <td>{{ cat.slug }}</td>
+              <td style="text-align:center;">{{ forloop.counter }}</td>              
+              <td>{% include "components/status_pill.html" with label=cat.name %}</td>  
+              <td>{% include "components/status_pill.html" with label=cat.parent.name %}</td>                           
               <td>{{ cat.created_at|date:"d-M-Y h:i A" }}</td>
               <td>{% include "components/profile_pill.html" with name=cat.created_by.get_full_name %}</td>
               <td>{{ cat.updated_at|date:"d-M-Y h:i A" }}</td>
               <td>{% include "components/profile_pill.html" with name=cat.updated_by.get_full_name %}</td>
               <td class="td-flex-center">
-                {% include "components/button-edit.html"
-                   with data_open="editCatModal-{{ cat.id }}" %}
+                {% include "components/button-edit.html" with data_open="editCatModal-{{ cat.id }}" %}
               </td>
             </tr>
             {% empty %}
@@ -89,10 +81,10 @@ media="(prefers-color-scheme: dark)"
             {% endfor %}
           </tbody>
         </table>
-
-                    {% for cat in categories %}
-                    {% include "components/modal-form.html" with modal_id="editCatModal-{{ cat.id }}" form=category_forms|get_item:cat.id form_id="editCatForm-{{ cat.id }}" title="Edit Categories" action_url=request.path submit_text="Update" %}
-                    {% endfor %}
+            
+            {% for cat in categories %}
+            {% include "components/modal-form.html" with modal_id="editCatModal-{{ cat.id }}" form=category_forms|get_item:cat.id form_id="editCatForm-{{ cat.id }}" title="Edit Categories" action_url=request.path submit_text="Update" %}
+            {% endfor %}
 
     </div>
     
