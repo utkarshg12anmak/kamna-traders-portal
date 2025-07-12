@@ -36,7 +36,13 @@ media="(prefers-color-scheme: dark)"
     
     <!-- 2b) FILTERS -->
     <div class="filters">
-        Manage Filters
+    
+        {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}     
+
+        {% include "components/button-filter.html" with text="Filter" id="applyFilters" %}   
+   
+    
+        {% include "components/button-filter-reset.html" with text="Reset" id="clearFilters" %}                                                                                                                                                                 
     </div>
     
     <!-- 2c) TABLES -->
@@ -66,7 +72,7 @@ media="(prefers-color-scheme: dark)"
                                 {{ forloop.counter }}
                             </td>                     
                             <td style="text-align:center;">{{ x.name }}</td>                             
-                            <td >{% include "components/status_pill.html" with label=x.abbreviation %}</td>                              
+                            <td class="td-flex-center" >{% include "components/status_pill.html" with label=x.abbreviation %}</td>                              
                             <td>{{ x.created_at|date:"d-M-y h:i A" }}</td> 
                             <td>{% include "components/profile_pill.html" with name=x.created_by.get_full_name %}</td>
                             <td>{{ x.updated_at|date:"d-M-y h:i A" }}</td> 
