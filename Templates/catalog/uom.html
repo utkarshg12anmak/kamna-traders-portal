@@ -65,8 +65,8 @@ media="(prefers-color-scheme: dark)"
                             <td style="text-align:center;">
                                 {{ forloop.counter }}
                             </td>                     
-                            <td >{% include "components/status_pill.html" with label=x.name %}</td> 
-                            <td style="text-align:center;">{{ x.abbreviation }}</td>  
+                            <td style="text-align:center;">{{ x.name }}</td>                             
+                            <td >{% include "components/status_pill.html" with label=x.abbreviation %}</td>                              
                             <td>{{ x.created_at|date:"d-M-y h:i A" }}</td> 
                             <td>{% include "components/profile_pill.html" with name=x.created_by.get_full_name %}</td>
                             <td>{{ x.updated_at|date:"d-M-y h:i A" }}</td> 
