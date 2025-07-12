@@ -24,3 +24,10 @@ def render_cell(value):
         full = value.get_full_name()
         return full or str(value)
     return value
+
+@register.filter
+def get_attr(obj, attr_name):
+    """
+    Given an object and attribute name (string), return getattr(obj, attr_name).
+    """
+    return getattr(obj, attr_name, '')

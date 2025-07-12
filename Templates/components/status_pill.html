@@ -1,0 +1,69 @@
+{# components/status_pill.html #}
+
+<style>
+       /* Status Pill Base */
+    .status-pill {
+        display: inline-block;
+        padding: 0.25em 0.75em;
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-weight: var(--font-weight-medium);
+        color: #fff;
+        text-transform: capitalize;
+    }
+
+    .status-pill--default {
+        background-color: var(--status-default);
+    }
+
+    .status-pill--active {
+        background-color: var(--status-default);
+    }
+
+    .status-pill--success {
+        background-color: var(--status-success);
+    }
+
+    .status-pill--warning {
+        background-color: var(--status-warning);
+        color: #1a202c;
+    }
+
+    .status-pill--error {
+        background-color: var(--status-error);
+    }
+
+    .status-pill--info {
+        background-color: var(--status-info);
+    }
+
+       .status-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  /* no bg/color here—JS will fill it in */
+}
+</style>
+
+{# <pre>DEBUG label="{{ label|default:'<empty>' }}"</pre> #}
+{% if label %}
+  <span class="status-pill"
+        data-status="{{ label|slugify }}">
+    {{ label }}
+  </span>
+  {# SPP: status pill include #}
+
+
+
+{% endif %}

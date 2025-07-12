@@ -70,45 +70,74 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        # Ensure the form is in context
+
+        # your existing “add” form
         if 'form' not in ctx:
             ctx['form'] = self.get_form()
 
-        # Sidebar/nav context (if you still need it)
+        # per‐row edit forms
+        ctx['brand_forms'] = {
+            brand.id: BrandForm(instance=brand)
+            for brand in ctx['brands']
+        }
+
+        # table configuration
+        ctx['table_columns'] = [
+            {'key': 'id',         'title': 'ID'},
+            {'key': 'name',       'title': 'Name'},
+            {'key': 'created_at', 'title': 'Created At'},
+            {'key': 'created_by', 'title': 'Created By'},
+            {'key': 'updated_at', 'title': 'Updated At'},
+            {'key': 'updated_by', 'title': 'Updated By'},
+        ]
+        ctx['rows']         = ctx['brands']      # pass your queryset
+        ctx['freeze_left']  = 1                  # e.g. freeze the first column
+        ctx['freeze_right'] = 1                  # e.g. freeze the last column
+
+        # sidebar/nav if you still need it…
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
         ctx["current_item"] = catalog
-        ctx["nav_items"]    = catalog.children.all().order_by("order", "name")
+        ctx["nav_items"]    = catalog.children.order_by("order","name")
 
-        ctx['table_columns'] = [
-            {'key':'id',           'title':'ID'},
-            {'key':'name',         'title':'Name'},
-            {'key':'created_at',   'title':'Created At'},
-            {'key':'created_by',   'title':'Created By'},
-            {'key':'updated_at',   'title':'Updated At'},
-            {'key':'updated_by',   'title':'Updated By'},
+        # tell the table to draw an “Edit” button for each row
+        ctx['actions'] = [
+            {
+                'label':      'Edit',
+                'btn_class':  'secondary-btn',     # whatever styling class you want
+                'modal_prefix': 'editBrandModal'   # used as data-open prefix
+            }
         ]
-
-        ctx['freeze_left']  = 0
-        ctx['freeze_right'] = 0
 
         return ctx
 
-    def post(self, request, *args, **kwargs):        
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST.copy()
+        brand_id = data.get('id')  # we’ll include <input name="id">
+        instance = Brand.objects.filter(pk=brand_id).first() if brand_id else None
+        form = BrandForm(data, instance=instance)
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-        form = self.get_form()
+
         if form.is_valid():
-            brand = form.save(user=request.user)   # <— pass user here
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            brand = form.save(user=request.user)
+            if is_ajax:
+                # return the updated brand data
                 return JsonResponse({
                     'success': True,
                     'brand': {
                         'id':   brand.id,
                         'name': brand.name,
                         'created_at': brand.created_at.strftime('%Y-%m-%d %H:%M'),
-                        'created_by': brand.created_by.get_full_name() or brand.created_by.username,
+                        'created_by': brand.created_by.get_full_name(),
+                        'updated_at': brand.updated_at.strftime('%Y-%m-%d %H:%M'),
+                        'updated_by': brand.updated_by.get_full_name(),
                     }
                 })
             return super().form_valid(form)
+
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return super().form_invalid(form)
     
 from django.urls import reverse_lazy
 from django.views.generic import ListView

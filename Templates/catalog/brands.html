@@ -1,6 +1,7 @@
 {# templates/Catalog/brands.html #}
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Catalog Items{% endblock %}
 
@@ -31,29 +32,71 @@ media="(prefers-color-scheme: dark)"
             <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
         </h1>
         <div class="action-buttons">                    
+            
+            
+            {% include "components/button-plus.html" with text="Brands" type="button" data_open="brandModal" class="ml-2" color="#e5383b" dark_color="#ba181b"%}
+            
+            
+            
+        </div>
+    </div>
+    
+    <!-- 2b) FILTERS -->
+    <div class="filters">
+        <p>Filters go here</p>
+    </div>
+    
+    <!-- 2c) TABLES -->
+    <div class="tables">
+        
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table" data-sticky-left="2" data-sticky-right="1">
+                    <thead>
+                        <tr>
+                            <th style="width: 3rem; text-align: right;">#</th>
+                            <th>Name</th>
 
-
-{% include "components/button-plus.html" with text="Brands" type="button" data_open="brandModal" class="ml-2" color="#e5383b" dark_color="#ba181b"%}
-
-
-
+                            <!-- audit -->
+                            <th>Created At</th>
+                            <th>Created By</th>
+                            <th>Updated At</th>
+                            <th>Updated By</th>
+                            
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for brand in object_list %}
+                        <tr>
+                            <td style="text-align: right;">
+                                {{ object_list.start_index|add:forloop.counter0 }}
+                            </td>     
+                            <td>{{ brand.name }}</td> 
+                            <td>{{ brand.created_at|date:"Y-m-d H:i" }}</td> 
+                            <td>{% include "components/profile_pill.html" with name=brand.created_by.get_full_name %}</td>
+                            <td>{{ brand.updated_at|date:"Y-m-d H:i" }}</td> 
+                            <td>{% include "components/profile_pill.html" with name=brand.updated_by.get_full_name %}</td>
+                            <td></td>                                                                                                                                                                                      
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No Brand found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "components/pagination.html" with page_obj=page_obj %}
+    </div>
+    
 </div>
-</div>
-
-<!-- 2b) FILTERS -->
-<div class="filters">
-    <p>Filters go here</p>
-</div>
-
-<!-- 2c) TABLES -->
-<div class="tables">
-  {% include "components/data-table.html" with columns=table_columns rows=brands freeze_left=freeze_left freeze_right=freeze_right %}
-</div>
-
 </section>
 
 <!-- Modal Overlay -->
 {% include "components/modal-form.html" with modal_id="brandModal" form_id="brandForm" title="New Brand" action_url=request.path form=form %}
 
-
+{% include "components/pills.html" %}
 {% endblock %}

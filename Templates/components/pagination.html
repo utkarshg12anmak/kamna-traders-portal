@@ -1,0 +1,93 @@
+{# templates/includes/pagination.html #}
+
+<style>
+        /* ─── PAGINATION STYLES ──────────────────────────────────── */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin: 0.5rem auto 0;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+    }
+
+    .pagination li {
+        margin: 0;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        display: block;
+
+        text-decoration: none;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        font-weight: var(--font-weight-medium);
+        color: var(--primary-color);
+        padding: 0.25rem 0.75rem;
+    }
+
+    .pagination li.active span {
+        background-color: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+        padding: 0.25rem 0.75rem;
+    }
+
+    .pagination li.ellipsis span {
+        pointer-events: none;
+        border-color: transparent;
+        background: transparent;
+        color: var(--text-medium);
+        padding: 0.25rem 0.75rem;
+    }
+
+    .pagination li:first-child a,
+    .pagination li:last-child a {
+        font-weight: var(--font-weight-bold);
+        padding: 0.25rem 0.75rem;
+    }
+</style>
+
+{% if page_obj.has_other_pages %}
+  {% with request.GET.urlencode as qp %}
+    <ul class="pagination">
+      {# Previous #}
+      {% if page_obj.has_previous %}
+        <li><a href="?{% if qp %}{{ qp }}&{% endif %}page={{ page_obj.previous_page_number }}">&lt;</a></li>
+      {% else %}
+        <li class="disabled"><span>&lt;</span></li>
+      {% endif %}
+
+      {# Page nums + ellipses #}
+      {% for num in page_obj.paginator.page_range %}
+
+        {# Show first 2, last 2, current ±1 #}
+        {% if num <= 2 or num > page_obj.paginator.num_pages|add:"-2" or num == page_obj.number or num == page_obj.number|add:"-1" or num == page_obj.number|add:"1" %}
+          
+          {% if num == page_obj.number %}
+            <li class="active"><span>{{ num }}</span></li>
+          {% else %}
+            <li><a href="?{% if qp %}{{ qp }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+          {% endif %}
+
+        {% elif num == 3 and page_obj.number > 4 %}
+          <li class="ellipsis"><span>&hellip;</span></li>
+
+        {% elif num == page_obj.paginator.num_pages|add:"-2" and page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
+          <li class="ellipsis"><span>&hellip;</span></li>
+
+        {% endif %}
+
+      {% endfor %}
+
+      {# Next #}
+      {% if page_obj.has_next %}
+        <li><a href="?{% if qp %}{{ qp }}&{% endif %}page={{ page_obj.next_page_number }}">&gt;</a></li>
+      {% else %}
+        <li class="disabled"><span>&gt;</span></li>
+      {% endif %}
+    </ul>
+  {% endwith %}
+{% endif %}

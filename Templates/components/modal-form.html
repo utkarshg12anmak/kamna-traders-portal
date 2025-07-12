@@ -172,6 +172,12 @@
         action="{{ action_url }}"
         class="modal-form">
         {% csrf_token %}
+
+                
+        {% if form.instance.pk %}
+        <input type="hidden" name="id" value="{{ form.instance.pk }}">
+        {% endif %}
+
         
         <div class="modal-body">
         {% for field in form %}
@@ -184,10 +190,13 @@
         </div>
         
         <div class="modal-footer">                               
-            {% include "components/button-close.html" with text="Cancel" data_close=modal_id %}
+            {% include "components/button-close.html" with text="Cancel" data_close=modal_id %}            
 
-            {% include "components/button-save.html" with text="Save" type="submit" %}
+            {% include "components/button-save.html" with text=submit_text|default:"Save" type="submit" %}
+
         </div>
     </form>
+
+    
 </div>
 </div>

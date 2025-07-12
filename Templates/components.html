@@ -1105,3 +1105,102 @@
 
 </style>
 
+
+<style>
+    /* ─── TABLE STYLES ───────────────────────────────────────────────── */
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: var(10px);
+        margin: 0 auto 1rem;
+        width: 100%;
+        position: relative;
+        /* Ensures consistent positioning context */
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        /* Crucial for sticky positioning */
+        border-spacing: 0;
+        background: #fff;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.7rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        white-space: nowrap;
+        /* Keep content on one line */
+        vertical-align: middle;
+        /* FIX #2: Explicitly align all cell content to prevent alignment shifts in sticky columns. */
+    }
+
+    .table th {
+        font-weight: var(--font-weight-medium);
+    }
+
+    /* Squircle corners on table */
+    .table thead tr:first-child th:first-child {
+        border-top-left-radius: 10px;
+    }
+
+    .table thead tr:first-child th:last-child {
+        border-top-right-radius: 10px;
+    }
+
+    .table tfoot tr:last-child td:first-child {
+        border-bottom-left-radius: 10px;
+    }
+
+    .table tfoot tr:last-child td:last-child {
+        border-bottom-right-radius: 10px;
+    }
+
+
+    /* ─── STICKY COLUMN & HEADER STYLES (REVISED) ────────────────── */
+
+    /* 1. Make the table header row sticky vertically */
+    .table thead th {
+        position: -webkit-sticky;
+        /* For Safari */
+        position: sticky;
+        top: 0;
+        background: #003249;
+        color: #fff;
+        z-index: 10;
+        /* Ensures header is above scrolling body content */
+    }
+
+    /* 2. Base style for any cell that is part of a sticky column */
+    .sticky-col {
+        position: -webkit-sticky;
+        /* For Safari */
+        position: sticky;
+    }
+
+    /* 3. FIX #1: Apply backgrounds contextually to ensure sticky headers keep their dark background. */
+    thead .sticky-col {
+        background: var(--primary-color);
+        /* Keep header background dark */
+        z-index: 11;
+        /* Elevate z-index to slide over other headers */
+    }
+
+    tbody .sticky-col {
+        background: #ffffff;
+        /* Set body cell background to white */
+        z-index: 2;
+        /* Position above non-sticky body cells */
+    }
+
+    /* 4. Style for left-sticky columns (for the border) */
+    .sticky-left {
+        border-right: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    /* 5. Style for right-sticky columns (for the border) */
+    .sticky-right {
+        border-left: 1px solid rgba(0, 0, 0, 0.15);
+    }
+</style>

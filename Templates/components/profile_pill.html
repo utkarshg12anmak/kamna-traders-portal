@@ -1,0 +1,15 @@
+{# templates/components/profile_pill.html #}
+
+{% load static %}
+
+
+{% if name %}
+<span class="profile-pill">
+  <span class="profile-pill__icon">
+    <img src="{% static 'user.svg' %}" alt="User" width="15" height="15" />
+  </span>
+  <span class="profile-pill__name">
+    {{ name }}
+  </span>
+</span>
+{% endif %}
