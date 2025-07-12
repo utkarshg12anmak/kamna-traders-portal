@@ -69,9 +69,10 @@ media="(prefers-color-scheme: dark)"
                     <tbody>
                         {% for brand in brands %}
                         <tr>
-                            <td style="text-align:right;">
-                            {{ brands.start_index|add:forloop.counter0 }}
-                            </td>                            
+ <td style="text-align:center;">
+  {{ forloop.counter }}
+</td>
+                     
                             <td>{% include "components/status_pill.html" with label=brand.name %}</td>  
                             <td>{{ brand.created_at|date:"Y-m-d H:i" }}</td> 
                             <td>{% include "components/profile_pill.html" with name=brand.created_by.get_full_name %}</td>
