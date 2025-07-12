@@ -60,7 +60,7 @@ class Category(models.Model):
         return self.name
 
 
-class UnitOfMeasure(models.Model):
+class UnitOfMeasure(TimeStampedUserModel):
     """
     Units for measuring items, weight, dimensions, etc.
     """

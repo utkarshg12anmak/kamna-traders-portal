@@ -136,27 +136,57 @@ from .forms import UnitOfMeasureForm
 from web_pages.models import PageItem
 
 class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
+    """
+    Shows the list of UOMs and handles both create-and-edit POSTs via the same URL.
+    """
     model               = UnitOfMeasure
     template_name       = "catalog/uom.html"
     context_object_name = "uoms"
+    paginate_by         = 10
 
-    form_class   = UnitOfMeasureForm
-    success_url  = reverse_lazy('catalog:catalog-uom')
+    form_class  = UnitOfMeasureForm
+    success_url = reverse_lazy('catalog:catalog-uom')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # you could add filtering here, e.g. via GET params
+        return qs.order_by('name')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        # bring in the empty (or bound) form
+
+        # provide the “add” form if it isn’t already in the context
         if 'form' not in ctx:
             ctx['form'] = self.get_form()
-        # sidebar/nav context if you need it
-        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
+
+        # a form for each existing UOM (for row-level editing)
+        ctx['uom_forms'] = {
+            uom.id: UnitOfMeasureForm(instance=uom)
+            for uom in ctx['uoms']
+        }
+
+        # nav/sidebar context
+        catalog = PageItem.objects.get(
+            name__iexact="Catalog",
+            parent__isnull=True
+        )
         ctx["current_item"] = catalog
         ctx["nav_items"]    = catalog.children.order_by("order", "name")
         return ctx
 
     def post(self, request, *args, **kwargs):
-        form    = self.get_form()
+        """
+        If `id` is present in POST, we edit that UoM, otherwise we create a new one.
+        Ajax requests get back JSON; normal posts redirect.
+        """
+        data      = request.POST.copy()
+        uom_id    = data.get('id')
+        instance  = UnitOfMeasure.objects.filter(pk=uom_id).first() if uom_id else None
+
+        # bind to either the new-uom form or an edit form
+        form = UnitOfMeasureForm(data, instance=instance)
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
         if form.is_valid():
             uom = form.save()
             if is_ajax:
@@ -169,10 +199,12 @@ class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
                     }
                 })
             return super().form_valid(form)
+
         # invalid
         if is_ajax:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
+
 
 from django.urls import reverse_lazy
 from django.views.generic import ListView
