@@ -31,3 +31,7 @@ def get_attr(obj, attr_name):
     Given an object and attribute name (string), return getattr(obj, attr_name).
     """
     return getattr(obj, attr_name, '')
+
+@register.filter
+def get_item(dict_, key):
+    return dict_.get(key)
