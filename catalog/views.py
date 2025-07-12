@@ -212,38 +212,70 @@ class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
 
 
 
-from django.urls import reverse_lazy
-from django.views.generic import ListView
+# catalog/views.py
+from django.urls        import reverse_lazy
+from django.views.generic      import ListView
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from .models import TaxRate
-from .forms  import TaxRateForm
-from web_pages.models import PageItem
+from django.http        import JsonResponse
+
+from web_pages.models   import PageItem
+from .models            import TaxRate
+from .forms             import TaxRateForm
+
 
 class TaxRateListView(LoginRequiredMixin, FormMixin, ListView):
     model               = TaxRate
     template_name       = "catalog/taxrates.html"
     context_object_name = "taxrates"
+    paginate_by         = 10
 
-    form_class   = TaxRateForm
-    success_url  = reverse_lazy('catalog:catalog-tax-rates')
+    form_class  = TaxRateForm
+    success_url = reverse_lazy('catalog:catalog-tax-rates')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # optional multi-filter on ?rates=1&rates=2…
+        rate_ids = self.request.GET.getlist("rates")
+        if rate_ids:
+            qs = qs.filter(id__in=rate_ids)
+        return qs.order_by('name')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        # all for the multi‐select filter
+        ctx["all_rates"] = TaxRate.objects.order_by("name")
+
+        # brand‐style “add” form
         if 'form' not in ctx:
             ctx['form'] = self.get_form()
-        # sidebar/nav if you use it
-        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
+
+        # per‐row edit forms
+        ctx['rate_forms'] = {
+            tr.id: TaxRateForm(instance=tr)
+            for tr in ctx['taxrates']
+        }
+
+        # sidebar/nav (unchanged)
+        catalog = PageItem.objects.get(
+            name__iexact="Catalog",
+            parent__isnull=True
+        )
         ctx["current_item"] = catalog
-        ctx["nav_items"]    = catalog.children.order_by("order","name")
+        ctx["nav_items"]    = catalog.children.order_by("order", "name")
         return ctx
 
     def post(self, request, *args, **kwargs):
-        form    = self.get_form()
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        data      = request.POST.copy()
+        rate_id   = data.get('id')
+        instance  = TaxRate.objects.filter(pk=rate_id).first() if rate_id else None
+
+        form      = TaxRateForm(data, instance=instance)
+        is_ajax   = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
         if form.is_valid():
-            tr = form.save()
+            tr = form.save(user=request.user)
             if is_ajax:
                 return JsonResponse({
                     'success': True,
@@ -254,9 +286,11 @@ class TaxRateListView(LoginRequiredMixin, FormMixin, ListView):
                     }
                 })
             return super().form_valid(form)
+
         if is_ajax:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
+
 
 from django.urls import reverse_lazy
 from django.views.generic import ListView

@@ -63,9 +63,9 @@ class UnitOfMeasureForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
 
 from django import forms
 from .models import TaxRate
-from .forms import BootstrapFormMixin  # your mixin from before
+from .forms import BootstrapFormMixin, AuditFormMixin   # your mixin from before
 
-class TaxRateForm(BootstrapFormMixin, forms.ModelForm):
+class TaxRateForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model  = TaxRate
         fields = ['name', 'rate']

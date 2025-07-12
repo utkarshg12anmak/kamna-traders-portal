@@ -28,7 +28,7 @@ urlpatterns = [
     path('brands/', BrandListView.as_view(), name='catalog-brands'),
     path('bom/', ItemListView.as_view(), name='catalog-bom'),     
     path('uom/', UnitOfMeasureListView.as_view(), name='catalog-uom'),         
-    path('tax-rates/', TaxRateListView.as_view(), name='catalog-tax-rates'),     
+    path('taxrates/', TaxRateListView.as_view(), name='catalog-tax-rates'),     
     path('item-categories/', CategoryListView.as_view(), name='manage_categories'), 
 
 ]

@@ -1,6 +1,7 @@
 {# templates/Catalog/tax-rates.html #}
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Catalog Home{% endblock %}
 
@@ -30,22 +31,124 @@ media="(prefers-color-scheme: dark)"
             <small class="page-subtitle"> &nbsp; ({{ object_list|length }} Records)</small>
         </h1>
         <div class="action-buttons">
-            {% include "components/button-plus.html" with text="Tax Rates" type="button" data_open="taxrateModal" class="ml-2" color="#e85d04" dark_color="#dc2f02"%}            
+            {% include "components/button-plus.html" with text="Tax Rates" type="button" data_open="newRateModal" class="ml-2" color="#e85d04" dark_color="#dc2f02"%}            
         </div>
     </div>
     
     <!-- 2b) FILTERS -->
     <div class="filters">
-        Manage Filters
+        
+        {% include "components/filter-multi-select.html" with button_id="uomFilterBtn" dropdown_id="uomFilterDropdown" select_id="uomFilterSelect" field_name="uoms" options=all_uoms selected=request.GET.uoms button_text="Filter UOMs" %}     
+        
+        {% include "components/button-filter.html" with text="Filter" id="applyRateFilters" %}   
+        
+        
+        {% include "components/button-filter-reset.html" with text="Reset" id="clearRateFilters" %}                                                                                                                                                                 
     </div>
     
     <!-- 2c) TABLES -->
     <div class="tables">
-        Manage Tables
-    </div>
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table" data-sticky-left="1" data-sticky-right="1">
+                    <thead>
+                        <tr>
+                            <th style="width: 3rem; text-align: right;">#</th>
+                            <th>Name</th>
+                            <th>Rates (%)</th>
+                            
+                            <!-- audit -->
+                            <th>Created At</th>
+                            <th>Created By</th>
+                            <th>Updated At</th>
+                            <th>Updated By</th>
+                            
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for x in taxrates %}
+                        <tr>
+                            <td style="text-align:center;">
+                                {{ forloop.counter }}
+                            </td>                     
+                            <td style="text-align:center;">{{ x.name }}</td>                             
+                            <td class="td-flex-center" >{% include "components/status_pill.html" with label=x.rate %}</td>                              
+                            <td>{{ x.created_at|date:"d-M-y h:i A" }}</td> 
+                            <td>{% include "components/profile_pill.html" with name=x.created_by.get_full_name %}</td>
+                            <td>{{ x.updated_at|date:"d-M-y h:i A" }}</td> 
+                            <td>{% include "components/profile_pill.html" with name=x.updated_by.get_full_name %}</td>
+                            <td class="td-flex-center">
+                                {% include "components/button-edit.html" with data_open="editUomModal-{{ uom.id }}" %}</td>                                                                                                                                                                                      
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    No Tax Rates found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                    {% for tr in taxrates %}
+                    {% include "components/modal-form.html" with modal_id="editRateModal-{{ tr.id }}" form_id="editRateForm-{{ tr.id }}" title="Edit Tax Rates" action_url=request.path form=rate_forms|get_item:tr.id submit_text="Update" %}
+                    {% endfor %}
+                    
+                    
+                </div>
+                {% include "components/pagination.html" with page_obj=page_obj %}
+            </div>
+        </div>
+        
+    </section>
     
-</section>
+    {% include "components/modal-form.html" with modal_id="newRateModal" form_id="newRateForm" title="New Unit of Measurement" action_url=request.path form=form %}
+    
+    {% include "components/pills.html" %}
+    
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Filter dropdown
+  const btn      = document.getElementById('rateFilterBtn');
+  const menu     = document.getElementById('rateFilterDropdown');
+  const selectEl = document.getElementById('rateFilterSelect');
+  const applyBtn = document.getElementById('applyRateFilters');
+  const resetBtn = document.getElementById('clearRateFilters');
 
-{% include "components/modal-form.html" with modal_id="taxrateModal" form_id="taxrateForm" title="New Tax Rates" action_url=request.path form=form %}
+  btn.addEventListener('click', () => menu.classList.toggle('active'));
+  document.addEventListener('click', e => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.remove('active');
+    }
+  });
 
-{% endblock %}
+  // multi‐select via Choices.js
+  const choices = new Choices(selectEl, {
+    removeItemButton: true,
+    searchEnabled:    true,
+    placeholderValue: 'Search rates…',
+    shouldSort:       false
+  });
+
+  applyBtn.addEventListener('click', () => {
+    const vals   = choices.getValue(true);
+    const params = new URLSearchParams(window.location.search);
+    params.delete('rates');
+    vals.forEach(v => params.append('rates', v));
+    window.location.search = params.toString();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    choices.clearStore();
+    const params = new URLSearchParams(window.location.search);
+    params.delete('rates');
+    window.location.search = params.toString();
+  });
+});
+</script>
+
+    
+    
+    {% endblock %}
+    

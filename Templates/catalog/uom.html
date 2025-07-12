@@ -50,7 +50,7 @@ media="(prefers-color-scheme: dark)"
     <div class="tables">
         <div class="card">
             <div class="table-responsive">
-                <table class="table" data-sticky-left="2" data-sticky-right="1">
+                <table class="table" data-sticky-left="1" data-sticky-right="1">
                     <thead>
                         <tr>
                             <th style="width: 3rem; text-align: right;">#</th>
@@ -72,7 +72,7 @@ media="(prefers-color-scheme: dark)"
                             <td style="text-align:center;">
                                 {{ forloop.counter }}
                             </td>                     
-                            <td style="text-align:center;">{{ x.name }}</td>                             
+                            <td>{{ x.name }}</td>                             
                             <td class="td-flex-center" >{% include "components/status_pill.html" with label=x.abbreviation %}</td>                              
                             <td>{{ x.created_at|date:"d-M-y h:i A" }}</td> 
                             <td>{% include "components/profile_pill.html" with name=x.created_by.get_full_name %}</td>

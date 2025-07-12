@@ -75,7 +75,7 @@ class UnitOfMeasure(TimeStampedUserModel):
         return self.abbreviation or self.name
 
 
-class TaxRate(models.Model):
+class TaxRate(TimeStampedUserModel):
     """
     GST/Tax rates for items.
     """
