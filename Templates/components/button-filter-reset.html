@@ -80,8 +80,35 @@
   }
 </style>
 
-<button class="btn-filter2" type="button" {% if data_open %}data-open="{{ data_open }}"{% endif %}>
+<button class="btn-filter2" type="button"  id="{{ id }}" {% if data_open %}data-open="{{ data_open }}"{% endif %}>
   <span class="btn-filter2__shadow"></span>
   <span class="btn-filter2__edge"></span>
   <span class="btn-filter2__front">{{ text|default:"Filter" }}</span>
 </button>
+
+<script>
+  // Apply Filters
+  document.getElementById('applyFilters').addEventListener('click', () => {
+    // collect checked values inside our checklist
+    const checked = Array.from(
+      document.querySelectorAll('#brandChecklist input[type=checkbox]:checked')
+    ).map(cb => cb.value);
+    
+    // re-build querystring
+    const params = new URLSearchParams(window.location.search);
+    // clear any old brands params
+    params.delete('brands');
+    // append each checked as ?brands=1&brands=2...
+    checked.forEach(v => params.append('brands', v));
+    
+    // reload
+    window.location.search = params.toString();
+  });
+
+  // Reset Filters
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('brands');
+    window.location.search = params.toString();
+  });
+</script>

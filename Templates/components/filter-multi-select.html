@@ -1,75 +1,80 @@
+<!-- components/filter-multi-select.html -->
 
-<style>
-  .filter-dropdown {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    padding: .5rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    z-index: 2000;
-  }
-  .filter-dropdown.active {
-    display: block;
-  }
-  .filter-multiselect {
-    width: 200px;
-  }
-</style>
+<div id="{{ dropdown_id }}" class="filter-dropdown">
+  <button
+    type="button"
+    id="{{ button_id }}"
+    class="btn-filter-trigger"
+  >{{ button_text }}</button>
 
-<div class="filter-wrapper" style="position: relative; display: inline-block;">
-  <button id="{{ button_id }}" type="button" class="btn-secondary">
-    {{ button_text }} ▾
-  </button>
-
-  <div id="{{ dropdown_id }}" class="filter-dropdown">
-    <form id="{{ form_id }}" method="get" action="">
-      <select id="{{ select_id }}"
-              name="{{ field_name }}"
-              class="filter-multiselect"
-              multiple
-              size="5">
-        {% for opt in options %}
-          <option value="{{ opt.id }}"
-            {% if opt.id|stringformat:"s" in selected %}
-              selected
-            {% endif %}>
-            {{ opt.name }}
-          </option>
-        {% endfor %}
-      </select>
-      <div style="margin-top:.5rem; text-align: right;">
-        <button type="submit" class="btn-primary btn-sm">Filter</button>
-        <button type="button"
-                id="{{ button_id }}-reset"
-                class="btn-secondary btn-sm">
-          Reset
-        </button>
-      </div>
-    </form>
+  <div class="filter-dropdown-menu">
+    <select
+      id="{{ select_id }}"
+      name="{{ field_name }}"
+      multiple
+    >
+      {% for opt in options %}
+        <option
+          value="{{ opt.id }}"
+          {% if opt.id|stringformat:"s" in selected %}selected{% endif %}
+        >
+          {{ opt.name }}
+        </option>
+      {% endfor %}
+    </select>
   </div>
 </div>
 
-<script>
-// Toggle dropdown
-document.getElementById('{{ button_id }}').addEventListener('click', e => {
-  e.stopPropagation();
-  const dd = document.getElementById('{{ dropdown_id }}');
-  dd.classList.toggle('active');
-});
+<style>
+  /* container positioning */
+  .filter-dropdown {
+    position: relative;
+    display: inline-block;
+  }
 
-// Reset selections
-document.getElementById('{{ button_id }}-reset').addEventListener('click', () => {
-  document.getElementById('{{ select_id }}').selectedIndex = -1;
-});
+  /* the hidden dropdown panel */
+  .filter-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.25rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 0.5rem;
+    z-index: 1000;
+    min-width: 200px;
+  }
 
-// Click outside closes dropdown
-document.addEventListener('click', () => {
-  const dd = document.getElementById('{{ dropdown_id }}');
-  dd.classList.remove('active');
-});
+  /* show when parent gets .active */
+  .filter-dropdown.active .filter-dropdown-menu {
+    display: block;
+  }
 
-// Prevent clicks inside dropdown from closing it
-document.getElementById('{{ dropdown_id }}')
-  .addEventListener('click', e => e.stopPropagation());
-</script>
+  /* style the native <select> (Choices.js will replace it) */
+  .filter-dropdown-menu select {
+    width: 100%;
+    height: 8rem;
+    padding: 0.25rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+  }
+
+  /* simple trigger button style */
+  .btn-filter-trigger {
+    background: #0077b6;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .btn-filter-trigger:hover {
+    background: #005f86;
+  }
+</style>

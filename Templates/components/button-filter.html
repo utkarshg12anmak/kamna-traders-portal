@@ -80,8 +80,10 @@
   }
 </style>
 
-<button class="btn-filter" type="button" {% if data_open %}data-open="{{ data_open }}"{% endif %}>
+<button class="btn-filter" type="button" id="{{ id }}" {% if data_open %}data-open="{{ data_open }}"{% endif %}>
   <span class="btn-filter__shadow"></span>
   <span class="btn-filter__edge"></span>
   <span class="btn-filter__front">{{ text|default:"Filter" }}</span>
+
 </button>
+

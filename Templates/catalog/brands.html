@@ -44,11 +44,11 @@ media="(prefers-color-scheme: dark)"
     <!-- 2b) FILTERS -->
     <div class="filters">        
 
-   {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" form_id="brandFilterForm" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}     
+   {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}     
 
-   {% include "components/button-filter.html" with text="Filter" data_open="brandFilterDropdown" %}   
+   {% include "components/button-filter.html" with text="Filter" id="applyFilters" %}   
    
-   {% include "components/button-filter-reset.html" with text="Reset" data_open="brandFilterDropdown" %}                                                                                                                                                                 
+   {% include "components/button-filter-reset.html" with text="Reset" id="clearFilters" %}                                                                                                                                                                 
 
     </div>
     
@@ -105,6 +105,7 @@ media="(prefers-color-scheme: dark)"
     </div>
     
 </div>
+
 </section>
 
 <!-- Modal Overlay -->
@@ -113,33 +114,50 @@ media="(prefers-color-scheme: dark)"
 {% include "components/pills.html" %}
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn      = document.getElementById('filterBtn');
-    const dd       = document.getElementById('filterDropdown');
-    const clearBtn = document.getElementById('clearFilter');
-    // Toggle dropdown
-    btn.addEventListener('click', e => {
-      dd.classList.toggle('active');
-    });
-    // Click outside to close
-    document.addEventListener('click', e => {
-      if (!btn.contains(e.target) && !dd.contains(e.target)) {
-        dd.classList.remove('active');
-      }
-    });
-    // Choices.js on our select
-    const choices = new Choices('#brandFilterSelect', {
-      removeItemButton: true,
-      searchEnabled:    true,
-      placeholderValue: 'Type to search brands…',
-      shouldSort:       false
-    });
-    // Clear selections
-    clearBtn.addEventListener('click', () => {
-      choices.removeActiveItems();
-    });
-  });
-</script>
+document.addEventListener('DOMContentLoaded', () => {
+  // grab our IDs
+  const btn        = document.getElementById('brandFilterBtn');
+  const menu       = document.getElementById('brandFilterDropdown');
+  const selectEl   = document.getElementById('brandFilterSelect');
+  const applyBtn   = document.getElementById('applyFilters');
+  const resetBtn   = document.getElementById('clearFilters');
 
+  // toggle dropdown
+  btn.addEventListener('click', () => {
+    menu.classList.toggle('active');
+  });
+  // click outside? close it
+  document.addEventListener('click', e => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.remove('active');
+    }
+  });
+
+  // initialize Choices.js on our multi-select
+  const choices = new Choices(selectEl, {
+    removeItemButton: true,
+    searchEnabled:    true,
+    placeholderValue: 'Type to search…',
+    shouldSort:       false
+  });
+
+  // APPLY: grab selected from choices and reload with ?brands=...
+  applyBtn.addEventListener('click', () => {
+    const selected = choices.getValue(true); // array of selected values
+    const params   = new URLSearchParams(window.location.search);
+    params.delete('brands');
+    selected.forEach(v => params.append('brands', v));
+    window.location.search = params.toString();
+  });
+
+  // RESET: clear selections in UI and URL
+  resetBtn.addEventListener('click', () => {
+    choices.clearStore();             // clear UI
+    const params = new URLSearchParams(window.location.search);
+    params.delete('brands');
+    window.location.search = params.toString();
+  });
+});
+</script>
 
 {% endblock %}
