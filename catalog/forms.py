@@ -88,16 +88,21 @@ class CategoryForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
             'parent': forms.Select(attrs={'placeholder': 'Optional parent'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        qs = Category.objects.filter(parent__isnull=True)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        self.fields['parent'].queryset = qs
+
     def clean_parent(self):
         parent = self.cleaned_data['parent']
-        # prevent deeper nesting than 2 levels
         if parent and parent.parent is not None:
             raise forms.ValidationError("You can only nest two levels.")
         return parent
 
     def clean_name(self):
         name = self.cleaned_data['name'].strip()
-        # unique=True on model, but nicer message:
-        if Category.objects.filter(name__iexact=name).exists():
+        if Category.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("A category with this name already exists.")
         return name
