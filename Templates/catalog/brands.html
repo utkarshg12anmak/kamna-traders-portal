@@ -42,8 +42,14 @@ media="(prefers-color-scheme: dark)"
     </div>
     
     <!-- 2b) FILTERS -->
-    <div class="filters">
-        <p>Filters go here</p>
+    <div class="filters">        
+
+   {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" form_id="brandFilterForm" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}     
+
+   {% include "components/button-filter.html" with text="Filter" data_open="brandFilterDropdown" %}   
+   
+   {% include "components/button-filter-reset.html" with data_open="" %}                                                                                                                                                                                            
+
     </div>
     
     <!-- 2c) TABLES -->
@@ -106,5 +112,34 @@ media="(prefers-color-scheme: dark)"
 
 {% include "components/pills.html" %}
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn      = document.getElementById('filterBtn');
+    const dd       = document.getElementById('filterDropdown');
+    const clearBtn = document.getElementById('clearFilter');
+    // Toggle dropdown
+    btn.addEventListener('click', e => {
+      dd.classList.toggle('active');
+    });
+    // Click outside to close
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('active');
+      }
+    });
+    // Choices.js on our select
+    const choices = new Choices('#brandFilterSelect', {
+      removeItemButton: true,
+      searchEnabled:    true,
+      placeholderValue: 'Type to search brands…',
+      shouldSort:       false
+    });
+    // Clear selections
+    clearBtn.addEventListener('click', () => {
+      choices.removeActiveItems();
+    });
+  });
 </script>
+
+
 {% endblock %}

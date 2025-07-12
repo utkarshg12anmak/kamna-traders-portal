@@ -69,8 +69,18 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
     form_class   = BrandForm
     success_url  = reverse_lazy('catalog:catalog-brands')
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # pull all brand‐IDs from ?brands=…&brands=…
+        brand_ids = self.request.GET.getlist("brands")
+        if brand_ids:
+            qs = qs.filter(id__in=brand_ids)
+        return qs  
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        ctx["all_brands"] = Brand.objects.order_by("name")
 
         # your existing “add” form
         if 'form' not in ctx:

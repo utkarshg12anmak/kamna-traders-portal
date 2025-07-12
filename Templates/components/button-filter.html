@@ -1,0 +1,87 @@
+{# Templates/components/button-filter.html #}
+<style>
+  /* Scoped to just this component */
+  .btn-filter {
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    outline-offset: 4px;
+    transition: filter 250ms;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .btn-filter__shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    background: hsla(0, 0%, 0%, 0.25);
+    transform: translateY(2px);
+    transition: transform 600ms cubic-bezier(.3,.7,.4,1);
+    z-index: 0;
+  }
+
+  .btn-filter__edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;    
+    background: linear-gradient(
+    to left,
+    #03045e 0%,
+    #03045e 8%,
+    #03045e 92%,
+    #03045e 100%
+  );
+    z-index: 1;
+  }
+
+  .btn-filter__front {
+    position: relative;
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #fff;
+    background: #0077b6;
+    transform: translateY(-4px);
+    transition: transform 600ms cubic-bezier(.3,.7,.4,1);
+    z-index: 2;
+  }
+
+  .btn-filter:hover {
+    filter: brightness(130%);
+  }
+  .btn-filter:hover .btn-filter__front {
+    transform: translateY(-6px);
+    transition: transform 250ms cubic-bezier(.3,.7,.4,1.5);
+  }
+  .btn-filter:active .btn-filter__front {
+    transform: translateY(-2px);
+    transition: transform 34ms;
+  }
+  .btn-filter:hover .btn-filter__shadow {
+    transform: translateY(4px);
+    transition: transform 250ms cubic-bezier(.3,.7,.4,1.5);
+  }
+  .btn-filter:active .btn-filter__shadow {
+    transform: translateY(1px);
+    transition: transform 34ms;
+  }
+  .btn-filter:focus:not(:focus-visible) {
+    outline: none;
+  }
+</style>
+
+<button class="btn-filter" type="button" {% if data_open %}data-open="{{ data_open }}"{% endif %}>
+  <span class="btn-filter__shadow"></span>
+  <span class="btn-filter__edge"></span>
+  <span class="btn-filter__front">{{ text|default:"Filter" }}</span>
+</button>
