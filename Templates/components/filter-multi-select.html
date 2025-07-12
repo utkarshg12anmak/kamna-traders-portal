@@ -20,12 +20,17 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 0.5rem;
     z-index: 1000;
-    min-width: 240px;
+    /* let it size to content, but no more than 500px */
+    width: max-content;
+    max-width: 1000px;
+    min-width: 350px;    /* optional floor */
+    white-space: normal; /* wrap long items if needed */
   }
 
   /* show when parent gets .active */
   .filter-dropdown.active .filter-dropdown-menu {
     display: block;
+    
   }
 
   /* style the native <select> (Choices.js will replace it) */
@@ -37,6 +42,7 @@
     border-radius: 0.25rem;
     box-sizing: border-box;
     font-size: 0.95rem;
+    
   }
 
   /* trigger button, namespaced */
@@ -53,6 +59,9 @@
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
+    min-width: 200px !important;
+    max-width: 400px;      /* optional cap */
+    white-space: normal;    /* allow wrapping if extremely long items */
   }
 
   .fm-select-trigger:hover {
