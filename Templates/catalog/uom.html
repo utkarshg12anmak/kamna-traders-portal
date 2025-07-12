@@ -37,13 +37,13 @@ media="(prefers-color-scheme: dark)"
     
     <!-- 2b) FILTERS -->
     <div class="filters">
-    
-        {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}     
-
-        {% include "components/button-filter.html" with text="Filter" id="applyFilters" %}   
-   
-    
-        {% include "components/button-filter-reset.html" with text="Reset" id="clearFilters" %}                                                                                                                                                                 
+        
+        {% include "components/filter-multi-select.html" with button_id="uomFilterBtn" dropdown_id="uomFilterDropdown" select_id="uomFilterSelect" field_name="uoms" options=all_uoms selected=request.GET.uoms button_text="Filter UOMs" %}     
+        
+        {% include "components/button-filter.html" with text="Filter" id="applyUomFilters" %}   
+        
+        
+        {% include "components/button-filter-reset.html" with text="Reset" id="clearUomFilters" %}                                                                                                                                                                 
     </div>
     
     <!-- 2c) TABLES -->
@@ -56,7 +56,7 @@ media="(prefers-color-scheme: dark)"
                             <th style="width: 3rem; text-align: right;">#</th>
                             <th>Name</th>
                             <th>Abbreviation</th>
-                                                        
+                            
                             <!-- audit -->
                             <th>Created At</th>
                             <th>Created By</th>
@@ -91,11 +91,11 @@ media="(prefers-color-scheme: dark)"
                         </tbody>
                     </table>
                     
-            {% for uom in uoms %}
-            {% include "components/modal-form.html" with modal_id="editUomModal-{{ uom.id }}" form=uom_forms|get_item:uom.id title="Edit UOM" action_url=request.path form=uom_forms|get_item:uom.id submit_text="Update" %}
-            {% endfor %}
+                    {% for uom in uoms %}
+                    {% include "components/modal-form.html" with modal_id="editUomModal-{{ uom.id }}" form=uom_forms|get_item:uom.id title="Edit UOM" action_url=request.path form=uom_forms|get_item:uom.id submit_text="Update" %}
+                    {% endfor %}
                     
-
+                    
                 </div>
                 {% include "components/pagination.html" with page_obj=page_obj %}
             </div>
@@ -106,6 +106,50 @@ media="(prefers-color-scheme: dark)"
     {% include "components/modal-form.html" with modal_id="uomModal" form_id="uomForm" title="New Unit of Measurement" action_url=request.path form=form %}
     
     {% include "components/pills.html" %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn      = document.getElementById('uomFilterBtn');
+            const menu     = document.getElementById('uomFilterDropdown');
+            const selectEl = document.getElementById('uomFilterSelect');
+            const applyBtn = document.getElementById('applyUomFilters');
+            const resetBtn = document.getElementById('clearUomFilters');
+            
+            // Toggle dropdown
+            btn.addEventListener('click', () => menu.classList.toggle('active'));
+            document.addEventListener('click', e => {
+                if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                    menu.classList.remove('active');
+                }
+            });
+            
+            // Choices.js for multi‐select/search
+            const choices = new Choices(selectEl, {
+                removeItemButton: true,
+                searchEnabled:    true,
+                placeholderValue: 'Type to search…',
+                shouldSort:       false
+            });
+            
+            // Apply filters
+            applyBtn.addEventListener('click', () => {
+                const vals   = choices.getValue(true);
+                const params = new URLSearchParams(window.location.search);
+                params.delete('uoms');
+                vals.forEach(v => params.append('uoms', v));
+                window.location.search = params.toString();
+            });
+            
+            // Reset filters
+            resetBtn.addEventListener('click', () => {
+                choices.clearStore();
+                const params = new URLSearchParams(window.location.search);
+                params.delete('uoms');
+                window.location.search = params.toString();
+            });
+        });
+    </script>
+    
     
     {% endblock %}
     

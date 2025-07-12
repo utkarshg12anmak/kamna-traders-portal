@@ -147,9 +147,14 @@ class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
 
     form_class  = UnitOfMeasureForm
     success_url = reverse_lazy('catalog:catalog-uom')
-
+    
     def get_queryset(self):
-        return super().get_queryset().order_by('name')
+        qs = super().get_queryset()
+        # pull all brand‐IDs from ?brands=…&brands=…
+        uom_ids = self.request.GET.getlist("uoms")
+        if uom_ids:
+            qs = qs.filter(id__in=uom_ids)
+        return qs
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -161,6 +166,9 @@ class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
             uom.id: UnitOfMeasureForm(instance=uom)
             for uom in ctx['uoms']
         }
+
+        ctx["all_uoms"] = UnitOfMeasure.objects.order_by("name")
+
         # sidebar/nav
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
         ctx['current_item'] = catalog
