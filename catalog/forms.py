@@ -52,7 +52,7 @@ class BrandForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
 
 from .models import UnitOfMeasure
 
-class UnitOfMeasureForm(BootstrapFormMixin, forms.ModelForm):
+class UnitOfMeasureForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model  = UnitOfMeasure
         fields = ['name', 'abbreviation']
