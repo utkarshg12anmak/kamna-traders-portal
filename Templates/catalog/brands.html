@@ -106,21 +106,5 @@ media="(prefers-color-scheme: dark)"
 
 {% include "components/pills.html" %}
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('[data-open]').forEach(btn => {
-    const target = btn.dataset.open;
-    btn.addEventListener('click', () => {
-      document.getElementById(target).classList.add('active');
-    });
-  });
-  document.querySelectorAll('[data-close]').forEach(btn => {
-    const target = btn.dataset.close;
-    btn.addEventListener('click', () => {
-      document.getElementById(target).classList.remove('active');
-    });
-  });
-});
-
 </script>
 {% endblock %}
