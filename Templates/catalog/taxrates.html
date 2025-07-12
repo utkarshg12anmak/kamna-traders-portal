@@ -38,7 +38,7 @@ media="(prefers-color-scheme: dark)"
     <!-- 2b) FILTERS -->
     <div class="filters">
         
-        {% include "components/filter-multi-select.html" with button_id="uomFilterBtn" dropdown_id="uomFilterDropdown" select_id="uomFilterSelect" field_name="uoms" options=all_uoms selected=request.GET.uoms button_text="Filter UOMs" %}     
+        {% include "components/filter-multi-select.html" with button_id="rateFilterBtn" dropdown_id="rateFilterDropdown" select_id="rateFilterSelect" field_name="rates" options=all_rates selected=request.GET.uoms button_text="Filter Rates" %}     
         
         {% include "components/button-filter.html" with text="Filter" id="applyRateFilters" %}   
         
