@@ -64,6 +64,7 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
     model = Brand
     template_name = "catalog/brands.html"
     context_object_name = "brands"
+    paginate_by = 10
 
     form_class   = BrandForm
     success_url  = reverse_lazy('catalog:catalog-brands')
@@ -80,33 +81,6 @@ class BrandListView(LoginRequiredMixin, FormMixin, ListView):
             brand.id: BrandForm(instance=brand)
             for brand in ctx['brands']
         }
-
-        # table configuration
-        ctx['table_columns'] = [
-            {'key': 'id',         'title': 'ID'},
-            {'key': 'name',       'title': 'Name'},
-            {'key': 'created_at', 'title': 'Created At'},
-            {'key': 'created_by', 'title': 'Created By'},
-            {'key': 'updated_at', 'title': 'Updated At'},
-            {'key': 'updated_by', 'title': 'Updated By'},
-        ]
-        ctx['rows']         = ctx['brands']      # pass your queryset
-        ctx['freeze_left']  = 1                  # e.g. freeze the first column
-        ctx['freeze_right'] = 1                  # e.g. freeze the last column
-
-        # sidebar/nav if you still need it…
-        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
-        ctx["current_item"] = catalog
-        ctx["nav_items"]    = catalog.children.order_by("order","name")
-
-        # tell the table to draw an “Edit” button for each row
-        ctx['actions'] = [
-            {
-                'label':      'Edit',
-                'btn_class':  'secondary-btn',     # whatever styling class you want
-                'modal_prefix': 'editBrandModal'   # used as data-open prefix
-            }
-        ]
 
         return ctx
 
