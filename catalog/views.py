@@ -312,18 +312,24 @@ class CategoryListView(LoginRequiredMixin, FormMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # optional multi-filter on ?parents=…&parents=…
-        parent_ids = self.request.GET.getlist("parents")
+        # pull selected name‐IDs and parent‐IDs from ?names=…&names=… and ?parents=…&parents=…
+        name_ids   = self.request.GET.getlist('names')
+        parent_ids = self.request.GET.getlist('parents')
+
+        if name_ids:
+            qs = qs.filter(id__in=name_ids)
+
         if parent_ids:
-            qs = qs.filter(parent_id__in=parent_ids)
-        return qs.order_by('parent__name', 'name')
+            qs = qs.filter(parent__id__in=parent_ids)
+
+        return qs.order_by('parent__id', 'name')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        # All categories for the multi-select dropdown
-        ctx["all_parents"] = Category.objects.filter(parent__isnull=True).order_by("name")
-
+        # All categories for the multi-select dropdown        
+        ctx['all_categories'] = Category.objects.order_by('name')
+        ctx['all_parents']    = Category.objects.filter(parent__isnull=True).order_by('name')
         # “New Category” form
         if 'form' not in ctx:
             ctx['form'] = self.get_form()

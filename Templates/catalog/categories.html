@@ -38,9 +38,13 @@ media="(prefers-color-scheme: dark)"
     <!-- 2b) FILTERS -->
     <div class="filters">
 
-        {% include "components/button-filter.html" with text="Filter" id="applyCategoryFilters" %}   
+{% include "components/filter-multi-select.html"  with button_id="catNameFilterBtn" dropdown_id="catNameDropdown" select_id="catNameSelect" field_name="names" options=all_categories selected=request.GET.names button_text="Filter Names" %}
+
+{% include "components/filter-multi-select.html" with button_id="catParentFilterBtn" dropdown_id="catParentDropdown" select_id="catParentSelect" field_name="parents" options=all_parents selected=request.GET.parents button_text="Filter Parents" %}
+
+        {% include "components/button-filter.html" with text="Filter" id="applyCatFilters" %}   
         
-        {% include "components/button-filter-reset.html" with text="Reset" id="clearCategoryFilters" %}    
+        {% include "components/button-filter-reset.html" with text="Reset" id="clearCatFilters" %}    
     </div>
     
     <!-- 2c) TABLES -->
@@ -96,38 +100,74 @@ media="(prefers-color-scheme: dark)"
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const btn      = document.getElementById('parentFilterBtn');
-  const menu     = document.getElementById('parentFilterDropdown');
-  const selectEl = document.getElementById('parentFilterSelect');
-  const applyBtn = document.getElementById('applyCategoryFilters');
-  const resetBtn = document.getElementById('clearCategoryFilters');
-
-  // toggle
-  btn.addEventListener('click', () => menu.classList.toggle('active'));
-  document.addEventListener('click', e => {
-    if (!btn.contains(e.target) && !menu.contains(e.target)) {
-      menu.classList.remove('active');
+  const toggles = [
+    {
+      btnId:   'catNameFilterBtn',
+      menuId:  'catNameDropdown',
+      selId:   'catNameSelect',
+      param:   'names'
+    },
+    {
+      btnId:   'catParentFilterBtn',
+      menuId:  'catParentDropdown',
+      selId:   'catParentSelect',
+      param:   'parents'
     }
+  ];
+
+  const applyBtn = document.getElementById('applyCatFilters');
+  const resetBtn = document.getElementById('clearCatFilters');
+
+  // store our Choices.js instances here
+  const choicesMap = {};
+
+  toggles.forEach(({ btnId, menuId, selId }) => {
+    const btn  = document.getElementById(btnId);
+    const menu = document.getElementById(menuId);
+    const sel  = document.getElementById(selId);
+
+    // toggle menu open/close
+    btn.addEventListener('click', e => {
+      menu.classList.toggle('active');
+      e.stopPropagation();
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('active');
+      }
+    });
+
+    // initialize Choices.js and stash it
+    choicesMap[selId] = new Choices(sel, {
+      removeItemButton: true,
+      searchEnabled:    true,
+      placeholderValue: 'Type to search…',
+      shouldSort:       false
+    });
   });
 
-  const choices = new Choices(selectEl, {
-    removeItemButton: true,
-    searchEnabled:    true,
-    placeholderValue: 'Search parents…',
-    shouldSort:       false
-  });
-
+  // APPLY: collect from each Choices instance
   applyBtn.addEventListener('click', () => {
-    const vals = choices.getValue(true);
     const params = new URLSearchParams(window.location.search);
+
+    // drop any old query-params
+    params.delete('names');
     params.delete('parents');
-    vals.forEach(v => params.append('parents', v));
+
+    toggles.forEach(({ selId, param }) => {
+      const vals = choicesMap[selId].getValue(true); // <-- correct instance
+      vals.forEach(v => params.append(param, v));
+    });
+
+    // reload with new filters
     window.location.search = params.toString();
   });
 
+  // RESET: clear each instance and URL
   resetBtn.addEventListener('click', () => {
-    choices.clearStore();
+    Object.values(choicesMap).forEach(ch => ch.clearStore());  
     const params = new URLSearchParams(window.location.search);
+    params.delete('names');
     params.delete('parents');
     window.location.search = params.toString();
   });
