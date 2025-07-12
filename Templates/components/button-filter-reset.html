@@ -1,104 +1,87 @@
-{# button-edit.html #}
+{# Templates/components/button-filter2.html #}
 <style>
-/* From Uiverse.io by cssbuttons-io */ 
-button {
- position: relative;
- border: none;
- background: transparent;
- padding: 0;
- cursor: pointer;
- outline-offset: 4px;
- transition: filter 250ms;
- user-select: none;
- touch-action: manipulation;
-}
+  /* Scoped to just this component */
+  .btn-filter2 {
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    outline-offset: 4px;
+    transition: filter 250ms;
+    user-select: none;
+    touch-action: manipulation;
+  }
 
-.shadow {
- position: absolute;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- border-radius: 12px;
- background: hsl(0deg 0% 0% / 0.25);
- will-change: transform;
- transform: translateY(2px);
- transition: transform
-    600ms
-    cubic-bezier(.3, .7, .4, 1);
-}
+  .btn-filter2__shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    background: hsla(0, 0%, 0%, 0.25);
+    transform: translateY(2px);
+    transition: transform 600ms cubic-bezier(.3,.7,.4,1);
+    z-index: 0;
+  }
 
-.edge {
- position: absolute;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- border-radius: 12px;
- background: linear-gradient(
+  .btn-filter2__edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;    
+    background: linear-gradient(
     to left,
     hsl(340deg 100% 16%) 0%,
-    hsl(340deg 100% 32%) 8%,
+    #a30036 8%,
     hsl(340deg 100% 32%) 92%,
     hsl(340deg 100% 16%) 100%
   );
-}
+    z-index: 1;
+  }
 
-.front {
- display: block;
- position: relative;
- padding: 6px 14px;
- border-radius: 12px;
- font-size: 1rem;
- color: white;
- background: hsl(345deg 100% 47%);
- will-change: transform;
- transform: translateY(-4px);
- transition: transform
-    600ms
-    cubic-bezier(.3, .7, .4, 1);
-}
+  .btn-filter2__front {
+    position: relative;
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #fff;
+    background: #c1121f 8%;
+    transform: translateY(-4px);
+    transition: transform 600ms cubic-bezier(.3,.7,.4,1);
+    z-index: 2;
+  }
 
-button:hover {
- filter: brightness(110%);
-}
-
-button:hover .front {
- transform: translateY(-6px);
- transition: transform
-    250ms
-    cubic-bezier(.3, .7, .4, 1.5);
-}
-
-button:active .front {
- transform: translateY(-2px);
- transition: transform 34ms;
-}
-
-button:hover .shadow {
- transform: translateY(4px);
- transition: transform
-    250ms
-    cubic-bezier(.3, .7, .4, 1.5);
-}
-
-button:active .shadow {
- transform: translateY(1px);
- transition: transform 34ms;
-}
-
-button:focus:not(:focus-visible) {
- outline: none;
-}
+  .btn-filter2:hover {
+    filter: brightness(130%);
+  }
+  .btn-filter2:hover .btn-filter2__front {
+    transform: translateY(-6px);
+    transition: transform 250ms cubic-bezier(.3,.7,.4,1.5);
+  }
+  .btn-filter2:active .btn-filter2__front {
+    transform: translateY(-2px);
+    transition: transform 34ms;
+  }
+  .btn-filter2:hover .btn-filter2__shadow {
+    transform: translateY(4px);
+    transition: transform 250ms cubic-bezier(.3,.7,.4,1.5);
+  }
+  .btn-filter2:active .btn-filter2__shadow {
+    transform: translateY(1px);
+    transition: transform 34ms;
+  }
+  .btn-filter2:focus:not(:focus-visible) {
+    outline: none;
+  }
 </style>
 
-
-<!-- From Uiverse.io by cssbuttons-io --> 
-<!-- From Uiverse.io by cssbuttons-io --> 
-<button>
-  <span class="shadow"></span>
-  <span class="edge"></span>
-  <span class="front text"> Reset
-  </span>
+<button class="btn-filter2" type="button" {% if data_open %}data-open="{{ data_open }}"{% endif %}>
+  <span class="btn-filter2__shadow"></span>
+  <span class="btn-filter2__edge"></span>
+  <span class="btn-filter2__front">{{ text|default:"Filter" }}</span>
 </button>
-
