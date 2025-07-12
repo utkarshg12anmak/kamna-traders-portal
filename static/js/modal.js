@@ -1,28 +1,28 @@
-// static/js/modal.js
 document.addEventListener('DOMContentLoaded', () => {
-  // delegate open buttons by [data-open]
+  // 1) open
   document.querySelectorAll('[data-open]').forEach(btn => {
-    const target = btn.dataset.open;
-    btn.addEventListener('click', () => {
-      document.getElementById(target).classList.add('active');
-    });
+    const id = btn.dataset.open;
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    btn.addEventListener('click', () => modal.classList.add('active'));
   });
 
-  // delegate close buttons by [data-close]
+  // 2) close
   document.querySelectorAll('[data-close]').forEach(btn => {
-    const target = btn.dataset.close;
-    btn.addEventListener('click', () => {
-      document.getElementById(target).classList.remove('active');
-    });
+    const id = btn.dataset.close;
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    btn.addEventListener('click', () => modal.classList.remove('active'));
   });
 
-  // Close when clicking on the backdrop itself
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-      // only if the click wasn’t inside the modal-box
-      if (e.target === overlay) {
-        overlay.classList.remove('active');
+  // 3) click-outside
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+      const box = modal.querySelector('.modal-box');
+      const opener = document.querySelector(`[data-open="${modal.id}"]`);
+      if (box && !box.contains(e.target) && !opener.contains(e.target)) {
+        modal.classList.remove('active');
       }
     });
   });
-});  
+});

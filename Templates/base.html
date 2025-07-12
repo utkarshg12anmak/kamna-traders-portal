@@ -345,6 +345,35 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) Wire up every “[data-open]” button to show its modal:
+  document.querySelectorAll('[data-open]').forEach(btn => {
+    const modalId = btn.getAttribute('data-open');
+    const modal   = document.getElementById(modalId);
+    if (!modal) return;
+    btn.addEventListener('click', () => modal.classList.add('active'));
+  });
+
+  // 2) Wire up every “[data-close]” button inside a modal to hide it:
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    const modalId = btn.getAttribute('data-close');
+    const modal   = document.getElementById(modalId);
+    if (!modal) return;
+    btn.addEventListener('click', () => modal.classList.remove('active'));
+  });
+
+  // 3) Optionally: clicking outside the .modal-box will close any open modal
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+      const box = modal.querySelector('.modal-box');
+      if (box && !box.contains(e.target) && !document.querySelector(`[data-open="${modal.id}"]`).contains(e.target)) {
+        modal.classList.remove('active');
+      }
+    });
+  });
+});
+</script>
 
 </body>
 
