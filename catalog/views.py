@@ -137,7 +137,8 @@ from web_pages.models import PageItem
 
 class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
     """
-    Shows the list of UOMs and handles both create-and-edit POSTs via the same URL.
+    Shows the list of UOMs and handles create‐and‐edit POSTs via the same URL,
+    setting created_by/updated_by on each save.
     """
     model               = UnitOfMeasure
     template_name       = "catalog/uom.html"
@@ -148,47 +149,43 @@ class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
     success_url = reverse_lazy('catalog:catalog-uom')
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        # you could add filtering here, e.g. via GET params
-        return qs.order_by('name')
+        return super().get_queryset().order_by('name')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
-        # provide the “add” form if it isn’t already in the context
+        # “New UoM” form
         if 'form' not in ctx:
             ctx['form'] = self.get_form()
-
-        # a form for each existing UOM (for row-level editing)
+        # per‐row “Edit UoM” forms
         ctx['uom_forms'] = {
             uom.id: UnitOfMeasureForm(instance=uom)
             for uom in ctx['uoms']
         }
-
-        # nav/sidebar context
-        catalog = PageItem.objects.get(
-            name__iexact="Catalog",
-            parent__isnull=True
-        )
-        ctx["current_item"] = catalog
-        ctx["nav_items"]    = catalog.children.order_by("order", "name")
+        # sidebar/nav
+        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
+        ctx['current_item'] = catalog
+        ctx['nav_items']    = catalog.children.order_by('order','name')
         return ctx
 
     def post(self, request, *args, **kwargs):
         """
-        If `id` is present in POST, we edit that UoM, otherwise we create a new one.
-        Ajax requests get back JSON; normal posts redirect.
+        If `id` is in POST we edit that UoM, otherwise create new.
+        Ajax => JSON; regular => redirect.
         """
         data      = request.POST.copy()
         uom_id    = data.get('id')
         instance  = UnitOfMeasure.objects.filter(pk=uom_id).first() if uom_id else None
-
-        # bind to either the new-uom form or an edit form
-        form = UnitOfMeasureForm(data, instance=instance)
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        form      = UnitOfMeasureForm(data, instance=instance)
+        is_ajax   = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
         if form.is_valid():
-            uom = form.save()
+            # commit=False so we can set audit fields
+            uom = form.save(commit=False)
+            if not uom.pk:               # brand-new record
+                uom.created_by = request.user
+            uom.updated_by = request.user
+            uom.save()
+
             if is_ajax:
                 return JsonResponse({
                     'success': True,
@@ -200,10 +197,11 @@ class UnitOfMeasureListView(LoginRequiredMixin, FormMixin, ListView):
                 })
             return super().form_valid(form)
 
-        # invalid
+        # form invalid
         if is_ajax:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
+
 
 
 from django.urls import reverse_lazy
