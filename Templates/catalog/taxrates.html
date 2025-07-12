@@ -41,7 +41,7 @@ media="(prefers-color-scheme: dark)"
         {% include "components/filter-multi-select.html" with button_id="rateFilterBtn" dropdown_id="rateFilterDropdown" select_id="rateFilterSelect" field_name="rates" options=all_rates selected=request.GET.uoms button_text="Filter Rates" %}     
         
         {% include "components/button-filter.html" with text="Filter" id="applyRateFilters" %}   
-                
+        
         {% include "components/button-filter-reset.html" with text="Reset" id="clearRateFilters" %}                                                                                                                                                                 
     </div>
     
@@ -107,46 +107,46 @@ media="(prefers-color-scheme: dark)"
     {% include "components/pills.html" %}
     
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Filter dropdown
-  const btn      = document.getElementById('rateFilterBtn');
-  const menu     = document.getElementById('rateFilterDropdown');
-  const selectEl = document.getElementById('rateFilterSelect');
-  const applyBtn = document.getElementById('applyRateFilters');
-  const resetBtn = document.getElementById('clearRateFilters');
-
-  btn.addEventListener('click', () => menu.classList.toggle('active'));
-  document.addEventListener('click', e => {
-    if (!btn.contains(e.target) && !menu.contains(e.target)) {
-      menu.classList.remove('active');
-    }
-  });
-
-  // multi‐select via Choices.js
-  const choices = new Choices(selectEl, {
-    removeItemButton: true,
-    searchEnabled:    true,
-    placeholderValue: 'Search rates…',
-    shouldSort:       false
-  });
-
-  applyBtn.addEventListener('click', () => {
-    const vals   = choices.getValue(true);
-    const params = new URLSearchParams(window.location.search);
-    params.delete('rates');
-    vals.forEach(v => params.append('rates', v));
-    window.location.search = params.toString();
-  });
-
-  resetBtn.addEventListener('click', () => {
-    choices.clearStore();
-    const params = new URLSearchParams(window.location.search);
-    params.delete('rates');
-    window.location.search = params.toString();
-  });
-});
-</script>
-
+        document.addEventListener('DOMContentLoaded', () => {
+            // Filter dropdown
+            const btn      = document.getElementById('rateFilterBtn');
+            const menu     = document.getElementById('rateFilterDropdown');
+            const selectEl = document.getElementById('rateFilterSelect');
+            const applyBtn = document.getElementById('applyRateFilters');
+            const resetBtn = document.getElementById('clearRateFilters');
+            
+            btn.addEventListener('click', () => menu.classList.toggle('active'));
+            document.addEventListener('click', e => {
+                if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                    menu.classList.remove('active');
+                }
+            });
+            
+            // multi‐select via Choices.js
+            const choices = new Choices(selectEl, {
+                removeItemButton: true,
+                searchEnabled:    true,
+                placeholderValue: 'Search rates…',
+                shouldSort:       false
+            });
+            
+            applyBtn.addEventListener('click', () => {
+                const vals   = choices.getValue(true);
+                const params = new URLSearchParams(window.location.search);
+                params.delete('rates');
+                vals.forEach(v => params.append('rates', v));
+                window.location.search = params.toString();
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                choices.clearStore();
+                const params = new URLSearchParams(window.location.search);
+                params.delete('rates');
+                window.location.search = params.toString();
+            });
+        });
+    </script>
+    
     
     
     {% endblock %}

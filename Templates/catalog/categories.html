@@ -1,6 +1,7 @@
 {# templates/Catalog/categories.html #}
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Catalog Home{% endblock %}
 
@@ -48,5 +49,6 @@ media="(prefers-color-scheme: dark)"
 
 {% include "components/modal-form.html" with modal_id="categoryModal" form_id="categoryForm" title="New Category" action_url=request.path form=form %}
 
+{% include "components/pills.html" %}
 
 {% endblock %}
