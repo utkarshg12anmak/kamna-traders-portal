@@ -34,8 +34,9 @@ def item_image_upload_to(instance, filename):
     base_folder = 'dev' if env == 'dev' else 'prod'
     return f"{base_folder}/items/{instance.item.sku}/{filename}"
 
+from .models import TimeStampedUserModel
 
-class Category(models.Model):
+class Category(TimeStampedUserModel):
     """
     Single model for L1/L2 categories (self-referential). Only two levels used in UI.
     """

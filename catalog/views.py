@@ -303,37 +303,68 @@ from .forms  import CategoryForm
 
 class CategoryListView(LoginRequiredMixin, FormMixin, ListView):
     model               = Category
-    template_name       = 'catalog/categories.html'
-    context_object_name = 'categories'
+    template_name       = "catalog/categories.html"
+    context_object_name = "categories"
+    paginate_by         = 10
 
-    form_class  = CategoryForm
+    form_class  = CategoryForm    # should inherit AuditFormMixin
     success_url = reverse_lazy('catalog:manage_categories')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # optional multi-filter on ?parents=…&parents=…
+        parent_ids = self.request.GET.getlist("parents")
+        if parent_ids:
+            qs = qs.filter(parent_id__in=parent_ids)
+        return qs.order_by('parent__name', 'name')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        # All categories for the multi-select dropdown
+        ctx["all_parents"] = Category.objects.filter(parent__isnull=True).order_by("name")
+
+        # “New Category” form
         if 'form' not in ctx:
             ctx['form'] = self.get_form()
-        # sidebar/nav
+
+        # Per-row “Edit” forms
+        ctx['category_forms'] = {
+            cat.id: CategoryForm(instance=cat)
+            for cat in ctx['categories']
+        }
+
+        # Sidebar/nav (unchanged)
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
-        ctx['current_item'] = catalog
-        ctx['nav_items']    = catalog.children.order_by('order','name')
+        ctx["current_item"] = catalog
+        ctx["nav_items"]    = catalog.children.order_by("order","name")
         return ctx
 
     def post(self, request, *args, **kwargs):
-        form    = self.get_form()
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        data     = request.POST.copy()
+        cat_id   = data.get('id')
+        instance = Category.objects.filter(pk=cat_id).first() if cat_id else None
+
+        form     = self.form_class(data, instance=instance)
+        is_ajax  = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
         if form.is_valid():
-            cat = form.save()
+            category = form.save(user=request.user)
             if is_ajax:
                 return JsonResponse({
-                    'success': True,
-                    'category': {
-                        'id':   cat.id,
-                        'name': cat.name,
-                        'parent': cat.parent.id if cat.parent else None,
-                    }
+                  'success': True,
+                  'category': {
+                    'id':     category.id,
+                    'name':   category.name,
+                    'parent': category.parent.id if category.parent else None,
+                    'created_at': category.created_at.strftime('%Y-%m-%d %H:%M'),
+                    'created_by': category.created_by.get_full_name(),
+                    'updated_at': category.updated_at.strftime('%Y-%m-%d %H:%M'),
+                    'updated_by': category.updated_by.get_full_name(),
+                  }
                 })
             return super().form_valid(form)
+
         if is_ajax:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)

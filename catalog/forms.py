@@ -79,7 +79,7 @@ from django.utils.text import slugify
 from .models import Category
 from .forms import BootstrapFormMixin  # your mixin that injects form-control
 
-class CategoryForm(BootstrapFormMixin, forms.ModelForm):
+class CategoryForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model  = Category
         fields = ['name', 'parent']
