@@ -1,140 +1,75 @@
-{# templates/components/filter-multi-select.html #}
-{% comment %}
-Reusable multi-select filter dropdown.
 
-Accepts these context vars:
- • button_id    – HTML id for the “Filters” toggle button
- • dropdown_id  – HTML id for the dropdown panel
- • form_id      – id for the <form> wrapper (method="get")
- • select_id    – id for the <select multiple>
- • field_name   – name="" attribute for your GET param
- • options      – an iterable of { id, name } items
- • selected     – a list of strings to mark <option selected>
- • button_text  – text for the toggle (default: “Filter”)
-{% endcomment %}
-
-{# 1) Choices.js CSS + component CSS #}
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
-/>
 <style>
-  .filter-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: .25rem;
-    padding: .5rem 1rem;
-    border: 1px solid #888;
-    background: #fff;
-    cursor: pointer;
-    border-radius: .25rem;
-  }
   .filter-dropdown {
     display: none;
     position: absolute;
-    top: 100%; right: 0;
-    margin-top: .5rem;
-    width: 300px;
-    background: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    padding: 1rem;
+    background: white;
+    border: 1px solid #ccc;
+    padding: .5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     z-index: 2000;
   }
   .filter-dropdown.active {
     display: block;
   }
-  .filter-actions {
-    margin-top: .75rem;
-    text-align: right;
-    display: flex;
-    gap: .5rem;
-    justify-content: flex-end;
-  }
-  .filter-actions button {
-    padding: .4rem .8rem;
-    border-radius: .25rem;
-    border: 1px solid transparent;
-  }
-  .filter-actions .reset-btn {
-    background: #f8f9fa;
-    border-color: #ccc;
-  }
-  .filter-actions .apply-btn {
-    background: #0d6efd;
-    color: #fff;
+  .filter-multiselect {
+    width: 200px;
   }
 </style>
 
-{# 2) Toggle + dropdown markup #}
-<button
-  id="{{ button_id }}"
-  class="filter-btn"
->
-  {{ button_text|default:"Filter" }}
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-       class="bi bi-funnel" viewBox="0 0 16 16">
-    <path d="M1.5 1.5h13l-5 5.5v4l-3 2v-6l-5-5.5z"/>
-  </svg>
-</button>
+<div class="filter-wrapper" style="position: relative; display: inline-block;">
+  <button id="{{ button_id }}" type="button" class="btn-secondary">
+    {{ button_text }} ▾
+  </button>
 
-<form id="{{ form_id }}" method="get" style="display:inline;">
   <div id="{{ dropdown_id }}" class="filter-dropdown">
-    <label for="{{ select_id }}"><strong>Select:</strong></label>
-    <select
-      id="{{ select_id }}"
-      name="{{ field_name }}"
-      multiple
-    >
-      {% for opt in options %}
-        <option
-          value="{{ opt.id }}"
-          {% if opt.id|stringformat:"s" in selected %}selected{% endif %}
-        >{{ opt.name }}</option>
-      {% endfor %}
-    </select>
-
-    <div class="filter-actions">
-      <button
-        type="button"
-        id="{{ dropdown_id }}-reset"
-        class="reset-btn"
-      >Reset</button>
-      <button type="submit" class="apply-btn">Apply</button>
-    </div>
+    <form id="{{ form_id }}" method="get" action="">
+      <select id="{{ select_id }}"
+              name="{{ field_name }}"
+              class="filter-multiselect"
+              multiple
+              size="5">
+        {% for opt in options %}
+          <option value="{{ opt.id }}"
+            {% if opt.id|stringformat:"s" in selected %}
+              selected
+            {% endif %}>
+            {{ opt.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <div style="margin-top:.5rem; text-align: right;">
+        <button type="submit" class="btn-primary btn-sm">Filter</button>
+        <button type="button"
+                id="{{ button_id }}-reset"
+                class="btn-secondary btn-sm">
+          Reset
+        </button>
+      </div>
+    </form>
   </div>
-</form>
+</div>
 
-{# 3) JS to wire it all up #}
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn      = document.getElementById('{{ button_id }}');
-    const dd       = document.getElementById('{{ dropdown_id }}');
-    const sel      = document.getElementById('{{ select_id }}');
-    const resetBtn = document.getElementById('{{ dropdown_id }}-reset');
+// Toggle dropdown
+document.getElementById('{{ button_id }}').addEventListener('click', e => {
+  e.stopPropagation();
+  const dd = document.getElementById('{{ dropdown_id }}');
+  dd.classList.toggle('active');
+});
 
-    // 3a) toggle dropdown
-    btn.addEventListener('click', () => dd.classList.toggle('active'));
+// Reset selections
+document.getElementById('{{ button_id }}-reset').addEventListener('click', () => {
+  document.getElementById('{{ select_id }}').selectedIndex = -1;
+});
 
-    // 3b) click outside to close
-    document.addEventListener('click', e => {
-      if (!btn.contains(e.target) && !dd.contains(e.target)) {
-        dd.classList.remove('active');
-      }
-    });
+// Click outside closes dropdown
+document.addEventListener('click', () => {
+  const dd = document.getElementById('{{ dropdown_id }}');
+  dd.classList.remove('active');
+});
 
-    // 3c) Choices.js on our <select multiple>
-    const choice = new Choices(sel, {
-      removeItemButton: true,
-      searchEnabled:    true,
-      placeholderValue: 'Type to search…',
-      shouldSort:       false
-    });
-
-    // 3d) reset button clears all selections
-    resetBtn.addEventListener('click', () => {
-      choice.removeActiveItems();
-    });
-  });
+// Prevent clicks inside dropdown from closing it
+document.getElementById('{{ dropdown_id }}')
+  .addEventListener('click', e => e.stopPropagation());
 </script>
