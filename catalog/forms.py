@@ -114,7 +114,7 @@ class ItemForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
         model = Item
         fields = [
             'name', 'description', 'type',
-            'l1_category', 'l2_category',
+            'l2_category',
             'hsn_code', 'status',
             'uom', 'gst_rate', 'brand',
             'weight', 'weight_uom',

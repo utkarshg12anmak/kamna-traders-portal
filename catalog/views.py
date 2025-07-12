@@ -377,7 +377,8 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
             qs = qs.filter(brand_id__in=brand_ids)
         # ...repeat for uoms, rates, categories...
         return qs.order_by('sku')
-
+    
+    
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
@@ -397,28 +398,27 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
         ctx['all_rates']      = TaxRate.objects.order_by('name')
         ctx['all_categories'] = Category.objects.filter(parent__isnull=True).order_by('name')
 
-        # sidebar/nav
+       # sidebar/nav
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
         ctx['current_item'] = catalog
         ctx['nav_items']    = catalog.children.order_by('order','name')
         return ctx
-
+    
     def post(self, request, *args, **kwargs):
-        data     = request.POST.copy()
-        item_id  = data.get('id')
-        instance = Item.objects.filter(pk=item_id).first() if item_id else None
-
-        form     = ItemForm(data, instance=instance)
-        is_ajax  = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        form = self.get_form()
+        is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
 
         if form.is_valid():
             item = form.save(commit=False)
+            # infer and set L1
+            chosen_l2 = form.cleaned_data["l2_category"]
+            if chosen_l2:
+                item.l1_category = chosen_l2.parent
+            # set audit fields
             if not item.pk:
                 item.created_by = request.user
             item.updated_by = request.user
             item.save()
-            form.save_m2m()  # if any many-to-many
-
             if is_ajax:
                 return JsonResponse({
                     'success': True,
@@ -432,5 +432,5 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
             return super().form_valid(form)
 
         if is_ajax:
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
-        return super().form_invalid(form)
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)
+        return super().form_invalid(form)    

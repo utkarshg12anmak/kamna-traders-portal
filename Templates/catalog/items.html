@@ -3,164 +3,128 @@
 
 {% block content %}
 <section class="main-content">
-  <div class="page-header">
-    <h1 class="page-title">Manage Items <small class="page-subtitle"> &nbsp; ({{ items|length }} Records)</small></h1>
-    <div class="action-buttons">
-      {% include "components/button-plus.html" with text="ITEMS" data_open="itemModal" %}
+    <div class="page-header">
+        <h1 class="page-title">Manage Items <small class="page-subtitle"> &nbsp; ({{ items|length }} Records)</small></h1>
+        <div class="action-buttons">
+            {% include "components/button-plus.html" with text="ITEMS" data_open="itemModal" %}
+        </div>
     </div>
-  </div>
-
-  <!-- FILTERS -->
-  <div class="filters">
-    {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}
-
-    {% include "components/filter-multi-select.html" with button_id="uomFilterBtn" dropdown_id="uomFilterDropdown" select_id="uomFilterSelect" field_name="uoms" options=all_uoms selected=request.GET.uoms button_text="Filter UOMs" %}
-
-    {% include "components/filter-multi-select.html" with button_id="rateFilterBtn" dropdown_id="rateFilterDropdown" select_id="rateFilterSelect" field_name="rates" options=all_rates selected=request.GET.rates button_text="Filter Rates" %}
-
-    {% include "components/filter-multi-select.html" with button_id="catFilterBtn" dropdown_id="catFilterDropdown" select_id="catFilterSelect" field_name="categories" options=all_categories selected=request.GET.categories button_text="Filter Categories" %}
-
-    {% include "components/button-filter.html"  with text="Filter" id="applyFilters" %}
-    {% include "components/button-filter-reset.html" with text="Reset" id="clearFilters" %}
-  </div>
-
-  <!-- TABLE -->
-  <div class="tables">
-    <div class="card">
-        <div class="table-responsive">
-      <table class="table" data-sticky-left="2" data-sticky-right="1">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>SKU</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>UoM</th>
-            <th>Rate</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in items %}
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ item.sku }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.brand }}</td>
-            <td>{{ item.uom }}</td>
-            <td>{{ item.gst_rate.rate }}%</td>
-            <td>{{ item.get_status_display }}</td>
-            <td class="td-flex-center">
-              {% include "components/button-edit.html" with data_open="editItemModal-{{ item.id }}" %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div></div>
-
-    <!-- per-row edit modals -->
-    {% for item in items %}
-      {% include "components/modal-form.html" with modal_id="editItemModal-{{ item.id }}" form_id="editItemForm-{{ item.id }}" form=item_forms|get_item:item.id title="Edit Item" action_url=request.path submit_text="Update" %} 
-    {% endfor %}
-  </div>
-</section>
-
-<!-- new-item modal -->
-{% include "components/modal-form.html" with modal_id="itemModal" form_id="itemForm" form=form title="New Item" action_url=request.path %}
-
-{% include "components/pills.html" %}
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // 1) MODAL OPEN/CLOSE LOGIC
-  document.querySelectorAll('[data-open]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-open');
-      document.getElementById(id).classList.add('active');
-    });
-  });
-  document.querySelectorAll('[data-close]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-close');
-      document.getElementById(id).classList.remove('active');
-    });
-  });
-  // click outside to close
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.classList.remove('active');
-    });
-  });
-
-  // 2) AJAX FORM SUBMISSION
-  // handles any form inside a modal
-  document.querySelectorAll('.modal-form').forEach(form => {
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const modal = form.closest('.modal-overlay');
-      const data  = new FormData(form);
-      const url   = form.getAttribute('action') || window.location.href;
-
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken':        document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: data
-      });
-
-      if (!resp.ok) {
-        // show validation errors
-        const {errors} = await resp.json();
-        for (const [field, msgs] of Object.entries(errors)) {
-          const errEl = document.getElementById(`${field}-error`);
-          if (errEl) {
-            errEl.textContent = msgs.join(', ');
-            errEl.style.display = 'block';
-          }
-        }
-        return;
-      }
-
-      const {item, brand, uom, taxrate, category} = await resp.json();
-      // based on which model, pick the returned object
-      const record = item || brand || uom || taxrate || category;
-      if (record) {
-        // 3) UPDATE TABLE ROW OR ADD NEW
-        // We'll assume each row has data-id="<pk>" attribute
-        let row = document.querySelector(`tr[data-id="${record.id}"]`);
-        if (!row) {
-          // NEW: clone a hidden “template” row, fill in, append
-          const tpl = document.getElementById('row-template');
-          row = tpl.content.firstElementChild.cloneNode(true);
-          row.dataset.id = record.id;
-          document.querySelector('tbody').append(row);
-        }
-        // FILL IN CELLS by column:
-        // e.g. name, abbreviation/rate/etc, created_at, created_by, updated_at, updated_by
-        row.querySelector('.col-name').textContent        = record.name;
-        if (record.abbr)   row.querySelector('.col-abbr').textContent   = record.abbr;
-        if (record.rate)   row.querySelector('.col-rate').textContent   = record.rate;
-        row.querySelector('.col-created-at').textContent  = record.created_at;
-        row.querySelector('.col-created-by').textContent  = record.created_by;
-        row.querySelector('.col-updated-at').textContent  = record.updated_at;
-        row.querySelector('.col-updated-by').textContent  = record.updated_by;
-
-        // make sure the Edit button’s data-open matches this new ID
-        const editBtn = row.querySelector('[data-open]');
-        if (editBtn) editBtn.setAttribute('data-open', form.id.replace('Form', '') + record.id);
-
-        // clear errors & close modal
-        modal.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
-        modal.classList.remove('active');
-      }
-    });
-  });
-});
-</script>
-
-
-{% endblock %}
+    
+    <!-- FILTERS -->
+    <div class="filters">
+        {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}
+        
+        {% include "components/filter-multi-select.html" with button_id="uomFilterBtn" dropdown_id="uomFilterDropdown" select_id="uomFilterSelect" field_name="uoms" options=all_uoms selected=request.GET.uoms button_text="Filter UOMs" %}
+        
+        {% include "components/filter-multi-select.html" with button_id="rateFilterBtn" dropdown_id="rateFilterDropdown" select_id="rateFilterSelect" field_name="rates" options=all_rates selected=request.GET.rates button_text="Filter Rates" %}
+        
+        {% include "components/filter-multi-select.html" with button_id="catFilterBtn" dropdown_id="catFilterDropdown" select_id="catFilterSelect" field_name="categories" options=all_categories selected=request.GET.categories button_text="Filter Categories" %}
+        
+        {% include "components/button-filter.html"  with text="Filter" id="applyFilters" %}
+        {% include "components/button-filter-reset.html" with text="Reset" id="clearFilters" %}
+    </div>
+    
+    <!-- TABLE -->
+    <div class="tables">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table" data-sticky-left="2" data-sticky-right="1">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Brand</th>
+                            <th>UoM</th>
+                            <th>Rate</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.sku }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.brand }}</td>
+                            <td>{{ item.uom }}</td>
+                            <td>{{ item.gst_rate.rate }}%</td>
+                            <td>{{ item.get_status_display }}</td>
+                            <td class="td-flex-center">
+                                {% include "components/button-edit.html" with data_open="editItemModal-{{ item.id }}" %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                No Items found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div></div>
+            
+            <!-- per-row edit modals -->
+            {% for item in items %}
+            {% include "components/modal-form.html" with modal_id="editItemModal-{{ item.id }}" form_id="editItemForm-{{ item.id }}" form=item_forms|get_item:item.id title="Edit Item" action_url=request.path submit_text="Update" %} 
+            {% endfor %}
+        </div>
+    </section>
+    
+    <!-- new-item modal -->
+    {% include "components/modal-form.html" with modal_id="itemModal" form_id="itemForm" form=form title="New Item" action_url=request.path %}
+    
+    {% include "components/pills.html" %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // for both “New Item” and per-row “Edit Item” modals:
+            function closeModal(modalId) {
+                const overlay = document.getElementById(modalId);
+                if (overlay) overlay.classList.remove('active');
+            }
+            
+            // helper to wire up a form inside a modal
+            function wireUpForm(formSelector, modalId) {
+                const form = document.querySelector(formSelector);
+                if (!form) return;
+                
+                form.addEventListener('submit', e => {
+                    e.preventDefault();
+                    const data = new FormData(form);
+                    fetch(form.action, {
+                        method: form.method,
+                        headers: {'X-Requested-With': 'XMLHttpRequest'},
+                        body: data
+                    })
+                    .then(r => r.json())
+                    .then(json => {
+                        if (json.success) {
+                            // TODO: update your table row here (insert or replace the <tr>)
+                                closeModal(modalId);
+                            } else {
+                                // TODO: render validation errors
+                                console.error(json.errors);
+                            }
+                        })
+                        .catch(err => console.error(err));
+                    });
+                }
+                
+                // wire up your “New Item” form
+                wireUpForm('#itemForm', 'itemModal');
+                
+                // wire up **every** edit-item form
+                document.querySelectorAll('[id^="editItemForm-"]').forEach(formEl => {
+                    const modalId = formEl.closest('.modal-overlay').id;
+                    wireUpForm(`#${formEl.id}`, modalId);
+                });
+            });
+        </script>
+        
+        
+        
+        {% endblock %}
+        
