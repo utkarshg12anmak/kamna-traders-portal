@@ -3,6 +3,7 @@
 from django import forms
 from django.forms import modelformset_factory
 from .models import UnitOfMeasure
+from .models import Item
 
 from django import forms
 
@@ -106,3 +107,21 @@ class CategoryForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
         if Category.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("A category with this name already exists.")
         return name
+
+
+class ItemForm(AuditFormMixin, BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = [
+            'name', 'description', 'type',
+            'l1_category', 'l2_category',
+            'hsn_code', 'status',
+            'uom', 'gst_rate', 'brand',
+            'weight', 'weight_uom',
+            'length', 'width', 'height', 'dimension_uom',
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'type': forms.Select(),
+            'status': forms.Select(),
+        }

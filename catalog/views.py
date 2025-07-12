@@ -26,24 +26,6 @@ class CatalogHomeView(TemplateView):
         ctx["nav_items"]    = catalog.children.all().order_by("order", "name")
         return ctx
         
-class ItemListView(ListView):
-    model = Item
-    template_name = "Catalog/items.html"
-    context_object_name = "object_list"
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["taxrate_formset"] = self.get_taxrate_formset()
-        return ctx
-
-    def post(self, request, *args, **kwargs):
-        formset = self.get_taxrate_formset(request.POST)
-        if formset.is_valid():
-            formset.save()
-            return redirect("catalog:catalog-items")
-        # if invalid, re-render with errors
-        return self.render_to_response(self.get_context_data(taxrate_formset=formset))
-
     
 # Add Manage Brands 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -368,6 +350,84 @@ class CategoryListView(LoginRequiredMixin, FormMixin, ListView):
                     'updated_at': category.updated_at.strftime('%Y-%m-%d %H:%M'),
                     'updated_by': category.updated_by.get_full_name(),
                   }
+                })
+            return super().form_valid(form)
+
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return super().form_invalid(form)
+
+from .models import Item
+from .forms  import ItemForm
+
+class ItemListView(LoginRequiredMixin, FormMixin, ListView):
+    model               = Item
+    template_name       = "catalog/items.html"
+    context_object_name = "items"
+    paginate_by         = 10
+
+    form_class  = ItemForm
+    success_url = reverse_lazy('catalog:catalog-items')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Example filters from ?brands=&uoms=&rates=&categories=
+        brand_ids = self.request.GET.getlist('brands')
+        if brand_ids:
+            qs = qs.filter(brand_id__in=brand_ids)
+        # ...repeat for uoms, rates, categories...
+        return qs.order_by('sku')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        # “New Item” form
+        if 'form' not in ctx:
+            ctx['form'] = self.get_form()
+
+        # per-row “edit” forms
+        ctx['item_forms'] = {
+            item.id: ItemForm(instance=item)
+            for item in ctx['items']
+        }
+
+        # data for your multi-select filters
+        ctx['all_brands']     = Brand.objects.order_by('name')
+        ctx['all_uoms']       = UnitOfMeasure.objects.order_by('name')
+        ctx['all_rates']      = TaxRate.objects.order_by('name')
+        ctx['all_categories'] = Category.objects.filter(parent__isnull=True).order_by('name')
+
+        # sidebar/nav
+        catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
+        ctx['current_item'] = catalog
+        ctx['nav_items']    = catalog.children.order_by('order','name')
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        data     = request.POST.copy()
+        item_id  = data.get('id')
+        instance = Item.objects.filter(pk=item_id).first() if item_id else None
+
+        form     = ItemForm(data, instance=instance)
+        is_ajax  = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+        if form.is_valid():
+            item = form.save(commit=False)
+            if not item.pk:
+                item.created_by = request.user
+            item.updated_by = request.user
+            item.save()
+            form.save_m2m()  # if any many-to-many
+
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'item': {
+                        'id':        item.id,
+                        'name':      item.name,
+                        'sku':       item.sku,
+                        # …and any other fields you want to return…
+                    }
                 })
             return super().form_valid(form)
 

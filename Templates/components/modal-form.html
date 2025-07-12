@@ -30,6 +30,11 @@
     transform: translateY(-10px); /* Subtle slide-in effect */
     transition: transform 0.2s ease-out;
     border: 1px solid #e0e0e0; /* Subtle border for definition */
+      /* NEW: cap height relative to the viewport and scroll overflow */
+    max-height: 80vh;        /* never taller than 80% of the screen */
+    overflow-y: auto;        /* if content exceeds, scroll vertically */
+    /* optional if your form ever grows wider than the box: */
+    overflow-x: auto;
 }
 
 .modal-overlay.active .modal-box {
@@ -70,6 +75,10 @@
     flex-direction: column;
     gap: 1rem; /* Consistent spacing between form groups */
     padding-top: 1rem; /* Space between header and first form element */
+      max-height: 50vh;        /* never taller than 80% of the screen */
+  overflow-y: auto;        /* if content exceeds, scroll vertically */
+  /* optional if your form ever grows wider than the box: */
+  overflow-x: auto;
 }
 
 .modal-body .form-group {
