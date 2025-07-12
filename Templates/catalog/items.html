@@ -35,22 +35,44 @@
                             <th>SKU</th>
                             <th>Name</th>
                             <th>Brand</th>
+                            <th>Status</th>
                             <th>UoM</th>
                             <th>Rate</th>
-                            <th>Status</th>
+                            <th>L1 Category</th>
+                            <th>L2 Category</th>
+                            <th>Weight</th>
+                            <th>LBH</th>
+                            <th>Created At</th>
+                            <th>Created By</th>
+                            <th>Updated At</th>
+                            <th>Updated By</th>
+                            
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in items %}
                         <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ item.sku }}</td>
+                            <td>{{ forloop.counter }}</td>                            
+                            <td>{% include "components/status_pill.html" with label=item.sku %}</td>  
                             <td>{{ item.name }}</td>
-                            <td>{{ item.brand }}</td>
-                            <td>{{ item.uom }}</td>
+                            <td>{% include "components/status_pill.html" with label=item.brand %}</td>   
+                            <td>{% include "components/status_pill.html" with label=item.get_status_display %}</td>                              
+                            <td>{% include "components/status_pill.html" with label=item.uom %}</td>                              
                             <td>{{ item.gst_rate.rate }}%</td>
-                            <td>{{ item.get_status_display }}</td>
+                            <td>{% include "components/status_pill.html" with label=item.l1_category.name %}</td>  
+                            <td>{% include "components/status_pill.html" with label=item.l2_category.name %}</td>                              
+                            <td>{{ item.weight }} {{ item.weight_uom }}</td>
+                            <td>{{ item.length }} X {{ item.width }} X {{ item.height }} {{ item.dimension_uom }} </td>
+                            
+                            <td>{{ item.created_at|date:"d-M-y h:i A" }}</td> 
+                            <td>{% include "components/profile_pill.html" with name=item.created_by.get_full_name %}</td>
+                            <td>{{ item.updated_at|date:"d-M-y h:i A" }}</td> 
+                            <td>{% include "components/profile_pill.html" with name=item.updated_by.get_full_name %}</td>
+                            
+                            
+                            
+                            
                             <td class="td-flex-center">
                                 {% include "components/button-edit.html" with data_open="editItemModal-{{ item.id }}" %}
                             </td>
@@ -104,6 +126,7 @@
                         if (json.success) {
                             // TODO: update your table row here (insert or replace the <tr>)
                                 closeModal(modalId);
+                                window.location.reload();
                             } else {
                                 // TODO: render validation errors
                                 console.error(json.errors);

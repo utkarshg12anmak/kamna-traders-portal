@@ -174,7 +174,7 @@ class Item(models.Model):
 
     # Physical attributes
     weight = models.DecimalField(
-        max_digits=10, decimal_places=3,
+        max_digits=10, decimal_places=2,
         blank=True, null=True,
         help_text="Weight of item in its unit"
     )
@@ -186,15 +186,15 @@ class Item(models.Model):
         help_text="Unit of measure for weight"
     )
     length = models.DecimalField(
-        max_digits=10, decimal_places=3,
+        max_digits=10, decimal_places=0,
         blank=True, null=True
     )
     width = models.DecimalField(
-        max_digits=10, decimal_places=3,
+        max_digits=10, decimal_places=0,
         blank=True, null=True
     )
     height = models.DecimalField(
-        max_digits=10, decimal_places=3,
+        max_digits=10, decimal_places=0,
         blank=True, null=True
     )
     dimension_uom = models.ForeignKey(
@@ -222,8 +222,8 @@ class Item(models.Model):
         ordering = ['sku']
 
     def save(self, *args, **kwargs):
-        # Generate SKU once on creation
-        if not self.sku:
+        # only generate the SKU when the row is first inserted
+        if self._state.adding:  
             self.sku = self._generate_sku()
         super().save(*args, **kwargs)
 

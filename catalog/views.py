@@ -405,7 +405,11 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
         return ctx
     
     def post(self, request, *args, **kwargs):
-        form = self.get_form()
+        data     = request.POST.copy()
+        item_id  = data.get('id')
+        instance = Item.objects.filter(pk=item_id).first() if item_id else None
+
+        form     = ItemForm(data, instance=instance)
         is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
 
         if form.is_valid():

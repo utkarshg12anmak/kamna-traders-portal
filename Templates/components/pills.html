@@ -2,9 +2,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   // 1) Define your buckets of statuses
   const buckets = {
-    positive: [ 'completed','done','shipped','interested','approved' ],
+    positive: [ 'completed','done','shipped','interested','approved','active' ],
     negative: [ 'declined','deleted','failed','not-interested' ],
-    neutral:  [ 'pending','approval-pending','on-hold','approval pending' ]
+    neutral:  [ 'pending','approval-pending','on-hold','approval pending','draft' ]
   };
 
   // 2) For each bucket, pick a list of base‐hues (one hue per status)
