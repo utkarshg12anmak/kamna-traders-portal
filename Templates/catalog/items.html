@@ -88,10 +88,6 @@
                 </table>
             </div></div>
             
-            <!-- per-row edit modals -->
-            {% for item in items %}
-            {% include "components/modal-form.html" with modal_id="editItemModal-{{ item.id }}" form_id="editItemForm-{{ item.id }}" form=item_forms|get_item:item.id title="Edit Item" action_url=request.path submit_text="Update" %} 
-            {% endfor %}
         </div>
     </section>
     

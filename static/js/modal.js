@@ -1,26 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 1) open
+  // OPEN
   document.querySelectorAll('[data-open]').forEach(btn => {
-    const id = btn.dataset.open;
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    btn.addEventListener('click', () => modal.classList.add('active'));
+    const modal = document.getElementById(btn.dataset.open);
+    if (modal) btn.addEventListener('click', () => modal.classList.add('active'));
   });
 
-  // 2) close
+  // CLOSE
   document.querySelectorAll('[data-close]').forEach(btn => {
-    const id = btn.dataset.close;
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    btn.addEventListener('click', () => modal.classList.remove('active'));
+    const modal = document.getElementById(btn.dataset.close);
+    if (modal) btn.addEventListener('click', () => modal.classList.remove('active'));
   });
 
-  // 3) click-outside
+  // CLICK-OUTSIDE
   document.addEventListener('click', e => {
     document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-      const box = modal.querySelector('.modal-box');
+      const box    = modal.querySelector('.modal-box');
       const opener = document.querySelector(`[data-open="${modal.id}"]`);
-      if (box && !box.contains(e.target) && !opener.contains(e.target)) {
+      if (box && !box.contains(e.target) && (!opener || !opener.contains(e.target))) {
         modal.classList.remove('active');
       }
     });
