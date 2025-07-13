@@ -371,11 +371,32 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Example filters from ?brands=&uoms=&rates=&categories=
+
+        # SKU filter
+        skus = self.request.GET.getlist('skus')
+        if skus:
+            qs = qs.filter(sku__in=skus)
+
+        # product-name filter
+        names = self.request.GET.getlist('product_names')
+        if names:
+            qs = qs.filter(name__in=names)
+
+        # brand filter (you already had this)
         brand_ids = self.request.GET.getlist('brands')
         if brand_ids:
             qs = qs.filter(brand_id__in=brand_ids)
-        # ...repeat for uoms, rates, categories...
+
+        # L1 category filter
+        l1_ids = self.request.GET.getlist('l1_categories')
+        if l1_ids:
+            qs = qs.filter(l1_category_id__in=l1_ids)
+
+        # L2 category filter
+        l2_ids = self.request.GET.getlist('l2_categories')
+        if l2_ids:
+            qs = qs.filter(l2_category_id__in=l2_ids)
+
         return qs.order_by('sku')
     
     
@@ -392,11 +413,16 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
             for item in ctx['items']
         }
 
-        # data for your multi-select filters
         ctx['all_brands']     = Brand.objects.order_by('name')
-        ctx['all_uoms']       = UnitOfMeasure.objects.order_by('name')
-        ctx['all_rates']      = TaxRate.objects.order_by('name')
         ctx['all_categories'] = Category.objects.filter(parent__isnull=True).order_by('name')
+
+        # new SKU + product-name lists
+        ctx['all_skus']           = Item.objects.values_list('sku', flat=True).distinct().order_by('sku')
+        ctx['all_product_names']  = Item.objects.values_list('name', flat=True).distinct().order_by('name')
+
+        # L1 / L2 category lists
+        ctx['all_l1_categories'] = Category.objects.filter(parent__isnull=True).order_by('name')
+        ctx['all_l2_categories'] = Category.objects.filter(parent__isnull=False).order_by('name')
 
        # sidebar/nav
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)

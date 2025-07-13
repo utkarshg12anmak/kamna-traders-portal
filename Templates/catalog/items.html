@@ -12,13 +12,16 @@
     
     <!-- FILTERS -->
     <div class="filters">
-        {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}
-        
-        {% include "components/filter-multi-select.html" with button_id="uomFilterBtn" dropdown_id="uomFilterDropdown" select_id="uomFilterSelect" field_name="uoms" options=all_uoms selected=request.GET.uoms button_text="Filter UOMs" %}
-        
-        {% include "components/filter-multi-select.html" with button_id="rateFilterBtn" dropdown_id="rateFilterDropdown" select_id="rateFilterSelect" field_name="rates" options=all_rates selected=request.GET.rates button_text="Filter Rates" %}
-        
-        {% include "components/filter-multi-select.html" with button_id="catFilterBtn" dropdown_id="catFilterDropdown" select_id="catFilterSelect" field_name="categories" options=all_categories selected=request.GET.categories button_text="Filter Categories" %}
+
+  {% include "components/filter-multi-select.html" with button_id="SKUFilterBtn" dropdown_id="SKUFilterDropdown" select_id="SKUFilterSelect" field_name="skus" options=all_skus selected=request.GET.skus button_text="Filter SKUs" %}
+
+  {% include "components/filter-multi-select.html" with button_id="ProductNameFilterBtn" dropdown_id="ProductNameFilterDropdown" select_id="ProductNameFilterSelect" field_name="product_names" options=all_product_names selected=request.GET.product_names button_text="Filter Product Names" %}
+
+  {% include "components/filter-multi-select.html" with button_id="brandFilterBtn" dropdown_id="brandFilterDropdown" select_id="brandFilterSelect" field_name="brands" options=all_brands selected=request.GET.brands button_text="Filter Brands" %}
+
+  {% include "components/filter-multi-select.html" with button_id="l1FilterBtn" dropdown_id="l1FilterDropdown" select_id="l1FilterSelect" field_name="l1_categories" options=all_l1_categories selected=request.GET.l1_categories button_text="Filter L1 Categories" %}
+
+  {% include "components/filter-multi-select.html" with button_id="l2FilterBtn" dropdown_id="l2FilterDropdown" select_id="l2FilterSelect" field_name="l2_categories" options=all_l2_categories selected=request.GET.l2_categories button_text="Filter L2 Categories" %}        
         
         {% include "components/button-filter.html"  with text="Filter" id="applyFilters" %}
         {% include "components/button-filter-reset.html" with text="Reset" id="clearFilters" %}
@@ -103,53 +106,75 @@
     
     {% include "components/pills.html" %}
     
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // for both “New Item” and per-row “Edit Item” modals:
-            function closeModal(modalId) {
-                const overlay = document.getElementById(modalId);
-                if (overlay) overlay.classList.remove('active');
-            }
-            
-            // helper to wire up a form inside a modal
-            function wireUpForm(formSelector, modalId) {
-                const form = document.querySelector(formSelector);
-                if (!form) return;
-                
-                form.addEventListener('submit', e => {
-                    e.preventDefault();
-                    const data = new FormData(form);
-                    fetch(form.action, {
-                        method: form.method,
-                        headers: {'X-Requested-With': 'XMLHttpRequest'},
-                        body: data
-                    })
-                    .then(r => r.json())
-                    .then(json => {
-                        if (json.success) {
-                            // TODO: update your table row here (insert or replace the <tr>)
-                                closeModal(modalId);
-                                window.location.reload();
-                            } else {
-                                // TODO: render validation errors
-                                console.error(json.errors);
-                            }
-                        })
-                        .catch(err => console.error(err));
-                    });
-                }
-                
-                // wire up your “New Item” form
-                wireUpForm('#itemForm', 'itemModal');
-                
-                // wire up **every** edit-item form
-                document.querySelectorAll('[id^="editItemForm-"]').forEach(formEl => {
-                    const modalId = formEl.closest('.modal-overlay').id;
-                    wireUpForm(`#${formEl.id}`, modalId);
-                });
-            });
-        </script>
-        
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) OPEN/CLOSE each multi‐select dropdown
+  const filters = [
+    ['SKUFilterBtn',        'SKUFilterDropdown',        'SKUFilterSelect'],
+    ['ProductNameFilterBtn','ProductNameFilterDropdown','ProductNameFilterSelect'],
+    ['brandFilterBtn',      'brandFilterDropdown',      'brandFilterSelect'],
+    ['l1FilterBtn',         'l1FilterDropdown',         'l1FilterSelect'],
+    ['l2FilterBtn',         'l2FilterDropdown',         'l2FilterSelect'],
+  ];
+
+  filters.forEach(([btnId, dropdownId, selectId]) => {
+    const btn      = document.getElementById(btnId);
+    const dropdown = document.getElementById(dropdownId);
+    const sel      = document.getElementById(selectId);
+    if (!btn || !dropdown || !sel) return;
+
+    // toggle dropdown
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      dropdown.classList.toggle('active');
+    });
+    // click outside closes
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('active');
+      }
+    });
+    // init Choices.js
+    new Choices(sel, {
+      removeItemButton: true,
+      searchEnabled:    true,
+      placeholderValue: 'Type to search…',
+      shouldSort:       false
+    });
+  });
+
+  // 2) APPLY filters
+  document.getElementById('applyFilters').addEventListener('click', () => {
+    const params = new URLSearchParams();
+    function append(fieldName, selectId) {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      Array.from(sel.selectedOptions).forEach(opt => {
+        if (opt.value) params.append(fieldName, opt.value);
+      });
+    }
+
+    append('skus',           'SKUFilterSelect');
+    append('product_names',  'ProductNameFilterSelect');
+    append('brands',         'brandFilterSelect');
+    append('l1_categories',  'l1FilterSelect');
+    append('l2_categories',  'l2FilterSelect');
+
+    // preserve page if present
+    const currentPage = new URLSearchParams(window.location.search).get('page');
+    if (currentPage) params.set('page', currentPage);
+
+    window.location.search = params.toString();
+  });
+
+  // 3) RESET filters
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    // empty search → just path without any ?…
+    window.location.search = '';
+  });
+});
+</script>
+
         
         
         {% endblock %}
