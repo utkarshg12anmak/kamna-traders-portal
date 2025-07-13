@@ -91,7 +91,7 @@
                 </table>
 
                     {% for item in items %}
-                    {% include "components/modal-form.html" with modal_id="editItemModal-{{ item.id }}" form=item_forms|get_item:item.id title="Edit Item" action_url=request.path form=item_forms|get_item:item.id submit_text="Update" %}
+                    {% include "components/modal-form.html" with modal_id="editItemModal-{{ item.id }}" form=item_forms|get_item:item.id title="Edit Item" upc_formset=upc_formset image_formset=image_formset action_url=request.path form=item_forms|get_item:item.id submit_text="Update" %}
                     {% endfor %}
 
             </div>
@@ -102,7 +102,7 @@
     </section>
     
     <!-- new-item modal -->
-    {% include "components/modal-form.html" with modal_id="itemModal" form_id="itemForm" form=form title="New Item" action_url=request.path %}    
+    {% include "components/modal-form.html" with modal_id="itemModal" form_id="itemForm" form=form title="New Item" upc_formset=upc_formset image_formset=image_formset action_url=request.path %}    
     
     {% include "components/pills.html" %}
     

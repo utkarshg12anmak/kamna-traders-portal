@@ -176,34 +176,80 @@
         
         
         <h3>{{ title }}</h3>
-        <form id="{{ form_id }}"
-        method="post"
-        action="{{ action_url }}"
-        class="modal-form">
-        {% csrf_token %}
+    <form id="{{ form_id }}"
+          method="post"
+          action="{{ action_url }}"
+          enctype="multipart/form-data"
+          class="modal-form"
+          enctype="multipart/form-data"
+    >
+      {% csrf_token %}
 
-                
-        {% if form.instance.pk %}
+      {% if form.instance.pk %}
         <input type="hidden" name="id" value="{{ form.instance.pk }}">
-        {% endif %}
+      {% endif %}
 
-        
-        <div class="modal-body">
+      <div class="modal-body">
+
+        {# -- Existing ItemForm fields -- #}
         {% for field in form %}
-            <div class="form-group">
+          <div class="form-group">
             {{ field.label_tag }}
             {{ field }}
             <div class="invalid-feedback" id="{{ field.name }}-error"></div>
-            </div>
+          </div>
         {% endfor %}
-        </div>
-        
-        <div class="modal-footer">                               
-            {% include "components/button-close.html" with text="Cancel" data_close=modal_id %}            
 
-            {% include "components/button-save.html" with text=submit_text|default:"Save" type="submit" %}
+        {# -- Inline formset: UPC codes -- #}
+        {% if upc_formset and image_formset %}
+          <hr>
+          <h4>UPC Codes</h4>
+          {{ upc_formset.management_form }}
+          {% if upc_formset.non_form_errors %}
+            <div class="alert alert-danger">
+              {{ upc_formset.non_form_errors }}
+            </div>
+          {% endif %}
+          {% for upc_form in upc_formset %}
+            <div class="form-group">
+              {{ upc_form.code.label_tag }}
+              {{ upc_form.code }}
+              {% if upc_form.DELETE %}
+                <label>{{ upc_form.DELETE }} Delete?</label>
+              {% endif %}
+              <div class="invalid-feedback" id="upcs-{{ forloop.counter0 }}-code-error"></div>
+            </div>
+          {% endfor %}
 
-        </div>
+          <hr>
+          <h4>Images (total ≤ 10 MB)</h4>
+          {{ image_formset.management_form }}
+          {% if image_formset.non_form_errors %}
+            <div class="alert alert-danger">
+              {{ image_formset.non_form_errors }}
+            </div>
+          {% endif %}
+          {% for img_form in image_formset %}
+            <div class="form-group">
+              {{ img_form.image.label_tag }}<br>
+              {{ img_form.image }}
+              {{ img_form.alt_text.label_tag }}
+              {{ img_form.alt_text }}
+              {% if img_form.DELETE %}
+                <label>{{ img_form.DELETE }} Delete?</label>
+              {% endif %}
+              <div class="invalid-feedback" id="images-{{ forloop.counter0 }}-image-error"></div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+      </div>
+
+      <div class="modal-footer">
+        {% include "components/button-close.html" with text="Cancel" data_close=modal_id %}
+        {% include "components/button-save.html" with text=submit_text|default:"Save" type="submit" %}
+      </div>
+
     </form>
 
     

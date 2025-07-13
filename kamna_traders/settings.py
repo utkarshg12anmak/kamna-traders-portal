@@ -11,7 +11,9 @@ USE_TZ = True
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load .env file
-load_dotenv(dotenv_path=BASE_DIR / ".env.prod")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "dev").lower()
+dotenv_path = BASE_DIR / (".env.prod" if ENVIRONMENT == "prod" else ".env.dev")
+load_dotenv(dotenv_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -179,19 +181,12 @@ if DEBUG:
 
 LOGOUT_REDIRECT_URL = "login"
 
-# 1) Load the “right” .env file
-ENVIRONMENT = os.getenv("ENVIRONMENT", "dev").lower()
-if ENVIRONMENT == "prod":
-    load_dotenv(BASE_DIR / ".env.prod")
-else:
-    load_dotenv(BASE_DIR / ".env.dev")
-
 
 #3) AWS / S3 Core Settings (all pulled from env)
 AWS_ACCESS_KEY_ID       = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_ACCESS_KEY   = os.environ["AWS_SECRET_ACCESS_KEY"]
 AWS_STORAGE_BUCKET_NAME = os.environ["AWS_STORAGE_BUCKET_NAME"]
-AWS_S3_REGION_NAME      = os.getenv("AWS_S3_REGION_NAME", "ap-south-1")
+AWS_S3_REGION_NAME      = os.getenv("AWS_S3_REGION_NAME", "eu-central-1")
 AWS_S3_SIGNATURE_VERSION  = "s3v4"
 AWS_S3_CUSTOM_DOMAIN      = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 AWS_DEFAULT_ACL           = "public-read"

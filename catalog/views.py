@@ -4,10 +4,34 @@ from django.shortcuts import redirect
 from django.forms import modelformset_factory
 from django.views.generic import ListView
 from .models import Item
+from .models import Item, UPC, ItemImage, Brand, Category
+
 
 from django.views.generic import TemplateView
 from web_pages.models import PageItem
 from .models import UnitOfMeasure
+
+
+from django.forms import inlineformset_factory
+
+# Inline formset for UPC codes
+UPCFormSet = inlineformset_factory(
+    parent_model=Item,
+    model=UPC,
+    fields=('code',),
+    extra=1,
+    can_delete=True,
+)
+
+# Inline formset for ItemImage
+ImageFormSet = inlineformset_factory(
+    parent_model=Item,
+    model=ItemImage,
+    fields=('image', 'alt_text'),
+    extra=1,
+    can_delete=True,
+)
+
 
 class CatalogHomeView(TemplateView):
     template_name = "catalog/home.html"
@@ -371,35 +395,29 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-
-        # SKU filter
+        # --- your multi-filters ---
         skus = self.request.GET.getlist('skus')
         if skus:
             qs = qs.filter(sku__in=skus)
 
-        # product-name filter
         names = self.request.GET.getlist('product_names')
         if names:
             qs = qs.filter(name__in=names)
 
-        # brand filter (you already had this)
         brand_ids = self.request.GET.getlist('brands')
         if brand_ids:
             qs = qs.filter(brand_id__in=brand_ids)
 
-        # L1 category filter
         l1_ids = self.request.GET.getlist('l1_categories')
         if l1_ids:
             qs = qs.filter(l1_category_id__in=l1_ids)
 
-        # L2 category filter
         l2_ids = self.request.GET.getlist('l2_categories')
         if l2_ids:
             qs = qs.filter(l2_category_id__in=l2_ids)
 
         return qs.order_by('sku')
-    
-    
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
@@ -407,60 +425,78 @@ class ItemListView(LoginRequiredMixin, FormMixin, ListView):
         if 'form' not in ctx:
             ctx['form'] = self.get_form()
 
+        # empty formsets for the modal on GET
+        ctx['upc_formset']   = UPCFormSet(prefix='upcs')
+        ctx['image_formset'] = ImageFormSet(prefix='images')
+
         # per-row “edit” forms
         ctx['item_forms'] = {
             item.id: ItemForm(instance=item)
             for item in ctx['items']
         }
 
-        ctx['all_brands']     = Brand.objects.order_by('name')
-        ctx['all_categories'] = Category.objects.filter(parent__isnull=True).order_by('name')
-
-        # new SKU + product-name lists
-        ctx['all_skus']           = Item.objects.values_list('sku', flat=True).distinct().order_by('sku')
-        ctx['all_product_names']  = Item.objects.values_list('name', flat=True).distinct().order_by('name')
-
-        # L1 / L2 category lists
+        # filter dropdown options
+        ctx['all_brands']        = Brand.objects.order_by('name')
+        ctx['all_skus']          = Item.objects.values_list('sku', flat=True).distinct().order_by('sku')
+        ctx['all_product_names'] = Item.objects.values_list('name', flat=True).distinct().order_by('name')
         ctx['all_l1_categories'] = Category.objects.filter(parent__isnull=True).order_by('name')
         ctx['all_l2_categories'] = Category.objects.filter(parent__isnull=False).order_by('name')
 
-       # sidebar/nav
+        # sidebar/nav
         catalog = PageItem.objects.get(name__iexact="Catalog", parent__isnull=True)
         ctx['current_item'] = catalog
-        ctx['nav_items']    = catalog.children.order_by('order','name')
+        ctx['nav_items']    = catalog.children.order_by('order', 'name')
+
         return ctx
-    
+
     def post(self, request, *args, **kwargs):
         data     = request.POST.copy()
         item_id  = data.get('id')
         instance = Item.objects.filter(pk=item_id).first() if item_id else None
 
-        form     = ItemForm(data, instance=instance)
+        form   = ItemForm(data, instance=instance)
+        upc_fs = UPCFormSet(request.POST,           instance=instance, prefix='upcs')
+        img_fs = ImageFormSet(request.POST, request.FILES,
+                              instance=instance, prefix='images')
+
+        # 1) validate all three
+        upc_valid = upc_fs.is_valid()
+        img_valid = img_fs.is_valid()
+
+        # 2) enforce 10 MB total upload
+        total_size = 0
+        for f in img_fs.forms:
+            cd = getattr(f, 'cleaned_data', None)
+            if cd and not cd.get('DELETE', False):
+                img = cd.get('image')
+                if img:
+                    total_size += img.size
+
+        if total_size > 10 * 1024 * 1024:
+            img_fs._non_form_errors = img_fs.error_class([
+                'Combined image size exceeds 10 MB'
+            ])
+            img_valid = False
+
         is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
 
-        if form.is_valid():
+        # 3) if *everything* is valid, save
+        if form.is_valid() and upc_valid and img_valid:
             item = form.save(commit=False)
-            # infer and set L1
-            chosen_l2 = form.cleaned_data["l2_category"]
-            if chosen_l2:
-                item.l1_category = chosen_l2.parent
-            # set audit fields
             if not item.pk:
                 item.created_by = request.user
             item.updated_by = request.user
             item.save()
-            if is_ajax:
-                return JsonResponse({
-                    'success': True,
-                    'item': {
-                        'id':        item.id,
-                        'name':      item.name,
-                        'sku':       item.sku,
-                        # …and any other fields you want to return…
-                    }
-                })
-            return super().form_valid(form)
 
-        if is_ajax:
-            return JsonResponse({"success": False, "errors": form.errors}, status=400)
-        return super().form_invalid(form)    
+            # re-bind & re-validate
+            upc_fs = UPCFormSet(request.POST, instance=item, prefix='upcs')
+            img_fs = ImageFormSet(request.POST, request.FILES, instance=item, prefix='images')
+            upc_fs.is_valid()
+            img_fs.is_valid()
+
+            upc_fs.save()
+            img_fs.save()
+
+            if is_ajax:
+                return JsonResponse({'success': True})
+            return super().form_valid(form)
