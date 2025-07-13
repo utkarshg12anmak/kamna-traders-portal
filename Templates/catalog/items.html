@@ -74,7 +74,7 @@
                             
                             
                             <td class="td-flex-center">
-                                {% include "components/button-edit.html" with data_open="editItemModal-{{ item.id }}" %}
+                                {% include "components/button-edit.html" with data_open="editItemModal-{{ item.id }}" %}                                
                             </td>
                         </tr>
                         {% empty %}
@@ -86,13 +86,20 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </div></div>
+
+                    {% for item in items %}
+                    {% include "components/modal-form.html" with modal_id="editItemModal-{{ item.id }}" form=item_forms|get_item:item.id title="Edit Item" action_url=request.path form=item_forms|get_item:item.id submit_text="Update" %}
+                    {% endfor %}
+
+            </div>
+             {% include "components/pagination.html" with page_obj=page_obj %}
+        </div>
             
         </div>
     </section>
     
     <!-- new-item modal -->
-    {% include "components/modal-form.html" with modal_id="itemModal" form_id="itemForm" form=form title="New Item" action_url=request.path %}
+    {% include "components/modal-form.html" with modal_id="itemModal" form_id="itemForm" form=form title="New Item" action_url=request.path %}    
     
     {% include "components/pills.html" %}
     
