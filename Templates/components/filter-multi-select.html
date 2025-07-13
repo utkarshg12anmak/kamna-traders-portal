@@ -85,6 +85,7 @@
   }
 </style>
 
+<!-- components/filter-multi-select.html #} -->
 <div id="{{ dropdown_id }}" class="filter-dropdown">
   <button
     type="button"
@@ -103,12 +104,19 @@
     >
       {% for opt in options %}
         <option
-          value="{{ opt.id }}"
-          {% if opt.id|stringformat:"s" in selected %}selected{% endif %}
+          value="{% if opt.id %}{{ opt.id }}{% else %}{{ opt }}{% endif %}"
+          {% if opt.id|stringformat:"s" in selected or opt|stringformat:"s" in selected %}
+            selected
+          {% endif %}
         >
-          {{ opt.name }}
+          {% if opt.name %}
+            {{ opt.name }}
+          {% else %}
+            {{ opt }}
+          {% endif %}
         </option>
       {% endfor %}
     </select>
   </div>
 </div>
+
