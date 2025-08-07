@@ -35,8 +35,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     'storages',
     'department',
-    "web_pages",
-    'catalog',    
+    "web_pages",       
     "rest_framework",
 ]
 

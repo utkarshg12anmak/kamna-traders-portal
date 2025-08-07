@@ -25,8 +25,7 @@ urlpatterns = [
     path("", wp_views.dashboard, name="dashboard"),
 
     # Page‐item pages (e.g. /catalog/, /sales/, etc.)
-    path("<slug:slug>/", wp_views.page_item, name="page-item"),
-    path('catalog/', include('catalog.urls')),
+    path("<slug:slug>/", wp_views.page_item, name="page-item"),    
 ]
 
 if settings.DEBUG:
