@@ -56,14 +56,16 @@ class CategoryAdmin(AuditAdmin):
 class ItemAdminForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = '__all__'
+        # Hide audit columns from the form entirely
+        exclude = ('created_by','updated_by','deleted_at','version','created_at','updated_at')
         widgets = {
             'sku': forms.TextInput(attrs={'readonly': 'readonly'})
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['brand'].queryset = Brand.objects.filter(is_active=True, deleted_at__isnull=True)
-        self.fields['category'].queryset = Category.objects.filter(is_active=True, deleted_at__isnull=True)
+        # Only Level-2 categories (must have a parent)
+        self.fields['category'].queryset = Category.objects.filter(parent__isnull=False, is_active=True, deleted_at__isnull=True)
         self.fields['uom'].queryset = UOM.objects.filter(is_active=True, deleted_at__isnull=True)
         self.fields['tax_rate'].queryset = TaxRate.objects.filter(is_active=True, deleted_at__isnull=True)
 
@@ -73,4 +75,5 @@ class ItemAdmin(AuditAdmin):
     list_display = ('sku','name','brand','category','unit_price','status','updated_at')
     list_filter = ('status','brand','category')
     search_fields = ('sku','name')
-    readonly_fields = ('sku','created_at','updated_at','version')
+    # Keep all audit fields read-only (from base) and also lock sku
+    readonly_fields = AuditAdmin.readonly_fields + ('sku',)

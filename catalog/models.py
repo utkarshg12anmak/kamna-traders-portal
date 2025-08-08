@@ -166,9 +166,13 @@ class Item(AuditModel):
 
     def clean(self):
         super().clean()
-        # Enforce Category depth (<=2)
-        if self.category and getattr(self.category, 'parent', None) and getattr(self.category.parent, 'parent', None):
-            raise ValidationError({'category': 'Only categories up to Level-2 are allowed.'})
+        if self.category:
+            # Must be a Level-2 category (must have a parent)
+            if getattr(self.category, 'parent', None) is None:
+                raise ValidationError({'category': 'Items must be assigned to a Level-2 category (select a child category).'})
+            # Max depth guard (<=2)
+            if getattr(self.category.parent, 'parent', None) is not None:
+                raise ValidationError({'category': 'Only categories up to Level-2 are allowed.'})
 
     def save(self, *args, **kwargs):
         creating = self._state.adding
@@ -179,6 +183,8 @@ class Item(AuditModel):
                 if not Item.objects.filter(sku=candidate).exists():
                     self.sku = candidate
                     break
+        # Validate business rules after ensuring SKU present
+        self.full_clean()
         return super().save(*args, **kwargs)
 
     def __str__(self):

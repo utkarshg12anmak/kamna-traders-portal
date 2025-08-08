@@ -13,4 +13,8 @@ class ItemSerializer(serializers.ModelSerializer):
             obj = attrs.get(field) or getattr(self.instance, field, None)
             if obj and (getattr(obj, 'is_active', True) is False or obj.deleted_at is not None):
                 raise serializers.ValidationError({field: 'Selected value is inactive.'})
+        # Category must be Level-2 (has a parent)
+        cat = attrs.get('category') or getattr(self.instance, 'category', None)
+        if cat is not None and cat.parent is None:
+            raise serializers.ValidationError({'category': 'Items must be assigned to a Level-2 category (child).'})
         return attrs
