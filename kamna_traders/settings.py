@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'department',
     "web_pages",       
     "rest_framework",
+    # added apps
+    "simple_history",
+    "catalog",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -51,6 +54,9 @@ MIDDLEWARE = [
     "accounts.middleware.StoreUserInfoMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",    
+    # added middleware
+    "simple_history.middleware.HistoryRequestMiddleware",
+    "catalog.middleware.CurrentUserMiddleware",
 ]
 
 ROOT_URLCONF = "kamna_traders.urls"
