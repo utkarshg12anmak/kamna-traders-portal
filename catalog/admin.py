@@ -39,15 +39,16 @@ class TaxRateAdmin(AuditAdmin):
 class CategoryAdminForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['name','parent']
+        fields = ['name','parent','is_active']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Parent can only be a Root category (no parent)
         self.fields['parent'].queryset = Category.objects.filter(parent__isnull=True, deleted_at__isnull=True)
 
 @admin.register(Category)
-class CategoryAdmin(SimpleHistoryAdmin):
+class CategoryAdmin(AuditAdmin):
     form = CategoryAdminForm
-    list_display = ('name','parent','created_at','updated_at','version')
-    list_filter = ('parent', 'created_at','updated_at')
+    list_display = ('name','parent','is_active','created_at','updated_at','version')
+    list_editable = ('is_active',)
+    list_filter = ('parent', 'is_active', 'created_at','updated_at')
     search_fields = ('name',)

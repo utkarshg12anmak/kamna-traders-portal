@@ -88,6 +88,8 @@ class Category(AuditModel):
         on_delete=models.PROTECT,
         related_name='children'
     )
+    # New active flag
+    is_active = models.BooleanField(default=True)
 
     history = HistoricalRecords(inherit=True)
 
