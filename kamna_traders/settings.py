@@ -194,6 +194,3 @@ AWS_S3_OBJECT_PARAMETERS  = {"CacheControl": "max-age=86400"}
 
 # 4) Bucket folder prefix
 FOLDER_PREFIX = "kamna-traders-prod" if ENVIRONMENT == "prod" else "kamna-traders-dev"
-
-
-DEFAULT_FILE_STORAGE = "catalog.storages.MediaStorage"
