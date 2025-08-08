@@ -4,9 +4,10 @@ from .models import Brand
 
 @admin.register(Brand)
 class BrandAdmin(SimpleHistoryAdmin):
-    list_display = ('name', 'website', 'created_at', 'updated_at', 'version')
+    list_display = ('name', 'website', 'is_active', 'created_at', 'updated_at', 'version')
+    list_editable = ('is_active',)
     search_fields = ('name', 'website', 'contact')
-    list_filter = ('created_at', 'updated_at')
+    list_filter = ('is_active', 'created_at', 'updated_at')
 
     # Do not allow manual edits to audit fields
     readonly_fields = (

@@ -38,6 +38,7 @@ class Brand(AuditModel):
     logo_url = models.URLField(blank=True)
     website = models.URLField(blank=True)
     contact = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
 
     history = HistoricalRecords(inherit=True)
 
