@@ -1,6 +1,7 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
-from .models import Brand, UOM, TaxRate
+from .models import Brand, UOM, TaxRate, Category
+from django import forms
 
 # Reusable admin that makes audit fields read-only and system-driven
 class AuditAdmin(SimpleHistoryAdmin):
@@ -34,3 +35,19 @@ class TaxRateAdmin(AuditAdmin):
     list_display = ('title', 'rate', 'is_active', 'created_at', 'updated_at', 'version')
     list_filter = ('is_active', 'created_at', 'updated_at')
     search_fields = ('title', 'description')
+
+class CategoryAdminForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name','parent']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Parent can only be a Root category (no parent)
+        self.fields['parent'].queryset = Category.objects.filter(parent__isnull=True, deleted_at__isnull=True)
+
+@admin.register(Category)
+class CategoryAdmin(SimpleHistoryAdmin):
+    form = CategoryAdminForm
+    list_display = ('name','parent','created_at','updated_at','version')
+    list_filter = ('parent', 'created_at','updated_at')
+    search_fields = ('name',)

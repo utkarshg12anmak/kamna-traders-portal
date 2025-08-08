@@ -4,6 +4,8 @@ from django.db import models
 from simple_history.models import HistoricalRecords
 from .utils import get_current_user
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
+from django.db.models import UniqueConstraint
 
 class AuditModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -77,3 +79,38 @@ class TaxRate(AuditModel):
 
     def __str__(self):
         return f"{self.title} ({self.rate}%)"
+
+# ─── Category (max depth 2) ───────────────────────────────────────────────────
+class Category(AuditModel):
+    name = models.CharField(max_length=120)
+    parent = models.ForeignKey(
+        'self', null=True, blank=True,
+        on_delete=models.PROTECT,
+        related_name='children'
+    )
+
+    history = HistoricalRecords(inherit=True)
+
+    class Meta:
+        ordering = ['name']
+        constraints = [
+            UniqueConstraint(fields=['parent', 'name'], name='uq_category_parent_name')
+        ]
+
+    @property
+    def level(self) -> int:
+        # Level-1 = Root (no parent); Level-2 = has parent
+        return 1 if self.parent is None else 2
+
+    def clean(self):
+        super().clean()
+        # Enforce max depth of Level-2
+        if self.parent and self.parent.parent is not None:
+            raise ValidationError({'parent': 'Only two levels allowed (Root -> Child). This parent already has a parent.'})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
