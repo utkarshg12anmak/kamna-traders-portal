@@ -1,6 +1,6 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
-from .models import Brand, UOM, TaxRate, Category
+from .models import Brand, UOM, TaxRate, Category, Item
 from django import forms
 
 # Reusable admin that makes audit fields read-only and system-driven
@@ -52,3 +52,25 @@ class CategoryAdmin(AuditAdmin):
     list_editable = ('is_active',)
     list_filter = ('parent', 'is_active', 'created_at','updated_at')
     search_fields = ('name',)
+
+class ItemAdminForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = '__all__'
+        widgets = {
+            'sku': forms.TextInput(attrs={'readonly': 'readonly'})
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['brand'].queryset = Brand.objects.filter(is_active=True, deleted_at__isnull=True)
+        self.fields['category'].queryset = Category.objects.filter(is_active=True, deleted_at__isnull=True)
+        self.fields['uom'].queryset = UOM.objects.filter(is_active=True, deleted_at__isnull=True)
+        self.fields['tax_rate'].queryset = TaxRate.objects.filter(is_active=True, deleted_at__isnull=True)
+
+@admin.register(Item)
+class ItemAdmin(AuditAdmin):
+    form = ItemAdminForm
+    list_display = ('sku','name','brand','category','unit_price','status','updated_at')
+    list_filter = ('status','brand','category')
+    search_fields = ('sku','name')
+    readonly_fields = ('sku','created_at','updated_at','version')

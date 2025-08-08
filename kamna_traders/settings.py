@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     # added apps
     "simple_history",
     "catalog",
+    # filters for DRF
+    "django_filters",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
