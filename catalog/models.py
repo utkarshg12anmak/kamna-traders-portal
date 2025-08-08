@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import models
 from simple_history.models import HistoricalRecords
 from .utils import get_current_user
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class AuditModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -47,3 +48,32 @@ class Brand(AuditModel):
 
     def __str__(self):
         return self.name
+
+# ─── UOM and TaxRate ───────────────────────────────────────────────────────────
+class UOM(AuditModel):
+    code = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=100)
+    decimals = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    history = HistoricalRecords(inherit=True)
+
+    class Meta:
+        ordering = ['code']
+
+    def __str__(self):
+        return f"{self.code}"
+
+class TaxRate(AuditModel):
+    title = models.CharField(max_length=120, unique=True)
+    description = models.TextField(blank=True)
+    rate = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    is_active = models.BooleanField(default=True)
+
+    history = HistoricalRecords(inherit=True)
+
+    class Meta:
+        ordering = ['title']
+
+    def __str__(self):
+        return f"{self.title} ({self.rate}%)"
